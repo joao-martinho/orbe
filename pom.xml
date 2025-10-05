@@ -9,9 +9,9 @@
 		<relativePath/>
 	</parent>
 	<groupId>br.furb</groupId>
-	<artifactId>tccon</artifactId>
+	<artifactId>orbe</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>tccon</name>
+	<name>orbe</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>

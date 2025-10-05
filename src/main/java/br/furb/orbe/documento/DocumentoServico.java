@@ -32,6 +32,7 @@ public class DocumentoServico {
         Documento.setEmailAluno(dto.getEmailAluno());
         Documento.setNomeArquivo(dto.getNomeArquivo());
         Documento.setArquivoBase64(dto.getArquivoBase64());
+        Documento.setProfTcc1(dto.isProfTcc1());
 
         DocumentoModelo salvo = documentoRepositorio.save(Documento);
         return ResponseEntity.status(201).body(salvo);

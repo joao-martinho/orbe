@@ -19,17 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
   async function carregarAlunos() {
     try {
       const response = await fetch('/alunos');
-      if (!response.ok) throw new Error('Erro ao carregar alunos');
+      if (!response.ok) throw new Error('Erro ao carregar alunos.');
+
       const alunos = await response.json();
-      alunos.forEach(aluno => {
+
+      for (const aluno of alunos) {
         const option = document.createElement('option');
         option.value = aluno.email;
-        option.textContent = aluno.email;
+        option.textContent = await buscarNomeAluno(aluno.email);
         selectAluno.appendChild(option);
-      });
+      }
     } catch (error) {
       console.error(error);
-      mensagem.innerHTML = `<div class="alert alert-danger">Não foi possível carregar a lista de alunos.</div>`;
     }
   }
 
@@ -39,21 +40,34 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`/documentos/${emailAutor}`);
       if (!response.ok) throw new Error('Erro ao carregar documentos');
       const documentos = await response.json();
+
       tabelaBody.innerHTML = '';
-      documentos.forEach(doc => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${doc.titulo}</td>
-          <td>${new Date(doc.criadoEm).toLocaleString()}</td>
-          <td>
-            <a href="/download/${doc.id}" class="btn btn-sm btn-primary">Baixar</a>
-          </td>
-        `;
-        tabelaBody.appendChild(tr);
-      });
+
+      documentos
+        .filter(doc => doc.profTcc1 === true)
+        .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
+        .forEach(doc => {
+          const tr = document.createElement('tr');
+
+          const dataFormatada = new Date(doc.criadoEm).toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          tr.innerHTML = `
+            <td>${doc.titulo}</td>
+            <td>${dataFormatada}</td>
+            <td>
+              <a href="/download/${doc.id}" class="btn btn-sm btn-primary">Baixar</a>
+            </td>
+          `;
+          tabelaBody.appendChild(tr);
+        });
     } catch (error) {
       console.error(error);
-      mensagem.innerHTML = `<div class="alert alert-warning">Não foi possível carregar as entregas.</div>`;
     }
   }
 
@@ -73,7 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
         emailAutor: localStorage.getItem('email'),
         emailAluno: selectAluno.value,
         nomeArquivo: file.name,
-        arquivoBase64: base64
+        arquivoBase64: base64,
+        profTcc1: true,
       };
 
       try {
@@ -82,18 +97,29 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(documento)
         });
-        if (!response.ok) throw new Error('Erro ao enviar documento');
-        mensagem.innerHTML = `<div class="alert alert-success">Documento enviado com sucesso!</div>`;
+        if (!response.ok) throw new Error('Erro ao enviar documento.');
         formulario.reset();
         await carregarEntregas();
       } catch (error) {
         console.error(error);
-        mensagem.innerHTML = `<div class="alert alert-danger">Falha ao enviar o documento.</div>`;
       }
     };
 
     reader.readAsDataURL(file);
   });
+
+  async function buscarNomeAluno(email) {
+    if (!email) return '—';
+    try {
+      const res = await fetch(`/alunos/${encodeURIComponent(email)}`);
+      if (!res.ok) throw new Error('Erro ao buscar aluno.');
+      const dados = await res.json();
+      return dados.nome || '—';
+    } catch (err) {
+      console.error(err);
+      return '—';
+    }
+  }
 
   carregarAlunos();
   carregarEntregas();

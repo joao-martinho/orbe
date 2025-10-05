@@ -11,6 +11,7 @@ public class DocumentoDTO {
     private String nomeArquivo;
     private String criadoEm;
     private String linkDownload;
+    private boolean profTcc1;
 
     public DocumentoDTO(DocumentoModelo modelo) {
         this.id = modelo.getId();
@@ -20,5 +21,6 @@ public class DocumentoDTO {
         this.nomeArquivo = modelo.getNomeArquivo();
         this.criadoEm = modelo.getCriadoEm().toString();
         this.linkDownload = "/documentos/" + modelo.getId() + "/download";
+        this.profTcc1 = modelo.isProfTcc1();
     }
 }

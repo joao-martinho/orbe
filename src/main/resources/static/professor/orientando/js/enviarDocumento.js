@@ -6,13 +6,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const btnSair = document.getElementById('btnSair');
+  const mensagem = document.getElementById('mensagem');
+  const tabela = document.getElementById('tabelaEntregas').getElementsByTagName('tbody')[0];
+  const formularioEntrega = document.getElementById('formularioEntrega');
+
   btnSair.addEventListener('click', () => {
     localStorage.clear();
     window.location.href = '../../login.html';
   });
-
-  const tabela = document.getElementById('tabelaEntregas').getElementsByTagName('tbody')[0];
-  const formularioEntrega = document.getElementById('formularioEntrega');
 
   const emailOrientador = localStorage.getItem('email');
   const emailAluno = localStorage.getItem('orientando');
@@ -33,7 +34,13 @@ document.addEventListener('DOMContentLoaded', function () {
       .then(data => {
         tabela.innerHTML = '';
 
-        data
+        const entregasFiltradas = data.filter(entrega => entrega.profTcc1 === false);
+
+        if (!entregasFiltradas.length) {
+          return;
+        }
+
+        entregasFiltradas
           .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
           .forEach(entrega => {
             const fileira = tabela.insertRow();
@@ -44,7 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
           });
       })
-      .catch(erro => console.error('Erro ao carregar entregas: ', erro));
+      .catch(erro => {
+        console.error('Erro ao carregar entregas: ', erro);
+      });
   }
 
   carregarEntregas();
@@ -55,7 +64,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const titulo = document.getElementById('titulo').value.trim();
     const arquivo = document.getElementById('arquivo').files[0];
 
-    if (!titulo || !arquivo) return;
+    if (!titulo || !arquivo) {
+      mensagem.innerHTML = `<div class="alert alert-warning">Título e arquivo são obrigatórios.</div>`;
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = function () {
@@ -66,7 +78,8 @@ document.addEventListener('DOMContentLoaded', function () {
         emailAutor: emailOrientador,
         emailAluno: emailAluno,
         nomeArquivo: arquivo.name,
-        arquivoBase64: arquivoBase64
+        arquivoBase64: arquivoBase64,
+        profTcc1: false
       };
 
       fetch('/documentos', {
@@ -82,10 +95,11 @@ document.addEventListener('DOMContentLoaded', function () {
           carregarEntregas();
           formularioEntrega.reset();
         })
-        .catch(err => console.error(err));
+        .catch(err => {
+          console.error(err);
+        });
     };
 
     reader.readAsDataURL(arquivo);
   });
-  
 });

@@ -46,6 +46,8 @@ public class DocumentoModelo {
     @NotNull
     private LocalDateTime criadoEm;
 
+    private boolean profTcc1;
+
     @PrePersist
     public void prePersist() {
         if (criadoEm == null) criadoEm = LocalDateTime.now();

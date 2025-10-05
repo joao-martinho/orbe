@@ -38,15 +38,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!resEntregas.ok) throw new Error('Erro ao buscar entregas');
       const entregasTotais = await resEntregas.json();
 
-      if (!entregasTotais.length) {
+      const entregasFiltradas = entregasTotais.filter(entrega => entrega.profTcc1 === false);
+
+      if (!entregasFiltradas.length) {
         tabelaBody.innerHTML = '';
         return;
       }
 
-      entregasTotais.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
+      entregasFiltradas.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
 
       tabelaBody.innerHTML = '';
-      for (const entrega of entregasTotais) {
+      for (const entrega of entregasFiltradas) {
         const dataFormatada = formatDataHoraBR(new Date(entrega.criadoEm));
         const nomeProfessor = await buscarNomeProfessor(entrega.emailAutor);
 
@@ -56,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td>${nomeProfessor}</td>
           <td>${dataFormatada}</td>
           <td>
-            <a href="${entrega.linkDownload}" class="btn btn-primary btn-sm" download>Download</a>
+            <a href="${entrega.linkDownload}" class="btn btn-primary btn-sm" download>Baixar</a>
           </td>
         `;
         tabelaBody.appendChild(tr);

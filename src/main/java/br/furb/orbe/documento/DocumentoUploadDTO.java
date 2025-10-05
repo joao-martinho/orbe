@@ -13,4 +13,5 @@ public class DocumentoUploadDTO {
     private String arquivoBase64;
     private String emailAutor;
     private String emailAluno;
+    private boolean profTcc1;
 }
