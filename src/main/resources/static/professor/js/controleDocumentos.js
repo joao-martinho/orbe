@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const btnSair = document.getElementById('btnSair');
   const tabelaBody = document.querySelector('#tabelaEntregas tbody');
-  const mensagem = document.getElementById('mensagem');
 
   btnSair.addEventListener('click', () => {
     localStorage.clear();
@@ -20,50 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  try {
-    const resProfessores = await fetch('/professores');
-    if (!resProfessores.ok) throw new Error('Erro ao buscar professores');
-    const professores = await resProfessores.json();
-
-    let entregasTotais = [];
-
-    for (const professor of professores) {
-      const email = professor.email;
-      const resEntregas = await fetch(`/documentos/aluno/${encodeURIComponent(email)}`);
-      if (!resEntregas.ok) continue;
-      const entregas = await resEntregas.json();
-      entregasTotais.push(...entregas);
-    }
-
-    if (entregasTotais.length === 0) {
-      mensagem.innerHTML = '<div class="alert alert-info">Nenhuma entrega encontrada.</div>';
-      return;
-    }
-
-    entregasTotais.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
-
-    tabelaBody.innerHTML = '';
-    for (const entrega of entregasTotais) {
-    const dataFormatada = formatDataHoraBR(new Date(entrega.criadoEm));
-    const nomeProfessor = await buscarNomeProfessor(entrega.emailAutor);
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-        <td>${entrega.titulo}</td>
-        <td>${nomeProfessor}</td>
-        <td>${dataFormatada}</td>
-        <td>
-        <a href="${entrega.linkDownload}" class="btn btn-primary btn-sm" download>Download</a>
-        </td>
-    `;
-    tabelaBody.appendChild(tr);
-    }
-
-  } catch (error) {
-    console.error(error);
-    mensagem.innerHTML = `<div class="alert alert-danger">Erro ao carregar entregas: ${error.message}</div>`;
-  }
-
   async function buscarNomeProfessor(email) {
     if (!email) return '—';
     try {
@@ -76,5 +31,42 @@ document.addEventListener('DOMContentLoaded', async () => {
       return '—';
     }
   }
-  
+
+  async function carregarEntregas() {
+    try {
+      const resEntregas = await fetch('/documentos');
+      if (!resEntregas.ok) throw new Error('Erro ao buscar entregas');
+      const entregasTotais = await resEntregas.json();
+
+      if (!entregasTotais.length) {
+        tabelaBody.innerHTML = '';
+        return;
+      }
+
+      entregasTotais.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
+
+      tabelaBody.innerHTML = '';
+      for (const entrega of entregasTotais) {
+        const dataFormatada = formatDataHoraBR(new Date(entrega.criadoEm));
+        const nomeProfessor = await buscarNomeProfessor(entrega.emailAutor);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${entrega.titulo}</td>
+          <td>${nomeProfessor}</td>
+          <td>${dataFormatada}</td>
+          <td>
+            <a href="${entrega.linkDownload}" class="btn btn-primary btn-sm" download>Download</a>
+          </td>
+        `;
+        tabelaBody.appendChild(tr);
+      }
+
+    } catch (error) {
+      console.error(error);
+      tabelaBody.innerHTML = '';
+    }
+  }
+
+  await carregarEntregas();
 });

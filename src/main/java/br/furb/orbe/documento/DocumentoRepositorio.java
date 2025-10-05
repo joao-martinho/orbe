@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface DocumentoRepositorio extends JpaRepository<DocumentoModelo, Long> {
 
     List<DocumentoModelo> findByEmailAutor(String emailAutor);
-    List<DocumentoModelo> findByEmailReceptor(String emailReceptor);
     List<DocumentoModelo> findByEmailAluno(String emailAluno);
 
 }

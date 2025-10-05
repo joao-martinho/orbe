@@ -27,14 +27,19 @@ public class DocumentoControle {
         return documentoServico.listarTodas();
     }
 
+    @GetMapping("/{email}")
+    public ResponseEntity<List<DocumentoDTO>> listarPorAutor(@PathVariable String email) {
+        return documentoServico.listarPorAutor(email);
+    }
+
     @GetMapping("/aluno/{email}")
     public ResponseEntity<List<DocumentoDTO>> listarPorAluno(@PathVariable String email) {
         return documentoServico.listarPorAluno(email);
     }
 
     @PostMapping
-    public ResponseEntity<DocumentoModelo> cadastrar(@PathVariable String email, @RequestBody DocumentoUploadDTO dto) throws IOException {
-        return documentoServico.cadastrar(email, dto);
+    public ResponseEntity<DocumentoModelo> cadastrar(@RequestBody DocumentoUploadDTO dto) throws IOException {
+        return documentoServico.cadastrar(dto);
     }
 
 }

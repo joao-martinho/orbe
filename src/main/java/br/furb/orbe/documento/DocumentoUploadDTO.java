@@ -11,5 +11,6 @@ public class DocumentoUploadDTO {
     private String titulo;
     private String nomeArquivo;
     private String arquivoBase64;
+    private String emailAutor;
     private String emailAluno;
 }

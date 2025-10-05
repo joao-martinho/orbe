@@ -19,7 +19,7 @@ public class DocumentoServico {
     private final DocumentoRepositorio documentoRepositorio;
     private final Path diretorio = Paths.get("uploads/documentos");
 
-    public ResponseEntity<DocumentoModelo> cadastrar(String email, DocumentoUploadDTO dto) throws IOException {
+    public ResponseEntity<DocumentoModelo> cadastrar(DocumentoUploadDTO dto) throws IOException {
         if (!Files.exists(diretorio)) Files.createDirectories(diretorio);
 
         byte[] bytes = Base64.getDecoder().decode(dto.getArquivoBase64());
@@ -28,7 +28,7 @@ public class DocumentoServico {
 
         DocumentoModelo Documento = new DocumentoModelo();
         Documento.setTitulo(dto.getTitulo());
-        Documento.setEmailAutor(email);
+        Documento.setEmailAutor(dto.getEmailAutor());
         Documento.setEmailAluno(dto.getEmailAluno());
         Documento.setNomeArquivo(dto.getNomeArquivo());
         Documento.setArquivoBase64(dto.getArquivoBase64());
