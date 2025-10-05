@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function carregarEntregas() {
     if (!emailAluno) return;
 
-    fetch(`/entregas/aluno/${emailOrientador}`)
+    fetch(`/documentos/aluno/${emailOrientador}`)
       .then(response => {
         if (!response.ok) throw new Error('Erro ao buscar entregas.');
         return response.json();
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
             fileira.innerHTML = `
               <td>${entrega.titulo}</td>
               <td>${formatarData(entrega.criadoEm)}</td>
-              <td><a href="/entregas/${entrega.id}/download" class="btn btn-sm btn-primary">Baixar</a></td>
+              <td><a href="/documentos/${entrega.id}/download" class="btn btn-sm btn-primary">Baixar</a></td>
             `;
           });
       })
@@ -64,13 +64,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const dados = {
         titulo: titulo,
         emailAutor: emailOrientador,
-        emailOrientador: null,
-        emailCoorientador: null,
+        emailReceptor: null,
         nomeArquivo: arquivo.name,
         arquivoBase64: arquivoBase64
       };
 
-      fetch(`/entregas/professor/${encodeURIComponent(emailOrientador)}`, {
+      fetch(`/documentos/professor/${encodeURIComponent(emailOrientador)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)

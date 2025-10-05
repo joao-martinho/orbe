@@ -34,6 +34,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  document.querySelectorAll('.col[data-role]').forEach(col => {
+    const role = col.dataset.role;
+    if (localStorage.getItem(role) === 'true') {
+      col.style.display = 'block';
+    } else {
+      col.style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('.col[data-role]').forEach(col => {
+    const role = col.dataset.role;
+    let label = null;
+
+    if (role === 'prof_tcc1') label = 'Professor de TCC I';
+    if (role === 'coord_bcc') label = 'Coordenador de BCC';
+    if (role === 'coord_sis') label = 'Coordenador de SIS';
+
+    if (label) {
+      const card = col.querySelector('.card');
+      if (!card) return;
+
+      const badgeContainer = document.createElement('div');
+      badgeContainer.className = 'position-absolute top-0 end-0 m-2';
+
+      const badge = document.createElement('span');
+      badge.className = 'badge bg-success';
+      badge.textContent = label;
+
+      badgeContainer.appendChild(badge);
+      card.classList.add('position-relative');
+      card.appendChild(badgeContainer);
+    }
+  });
 
   function criarCard(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
     if (emailsProcessados.has(aluno.email)) return;

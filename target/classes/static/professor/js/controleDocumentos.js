@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     for (const professor of professores) {
       const email = professor.email;
-      const resEntregas = await fetch(`/entregas/aluno/${encodeURIComponent(email)}`);
+      const resEntregas = await fetch(`/documentos/aluno/${encodeURIComponent(email)}`);
       if (!resEntregas.ok) continue;
       const entregas = await resEntregas.json();
       entregasTotais.push(...entregas);
