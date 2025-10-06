@@ -115,6 +115,17 @@ classDiagram
         -LocalDateTime criadoEm
     }
 
+    class DocumentoModelo {
+        -Long id
+        -String titulo
+        -String emailAutor
+        -String emailAluno
+        -String nomeArquivo
+        -String arquivoBase64
+        -LocalDateTime criadoEm
+        -boolean profTcc1
+    }
+
     class NotificacaoModelo {
         -Long id
         -String titulo
@@ -140,6 +151,8 @@ classDiagram
     EntregaModelo --> ProfessorModelo : orientador/coorientador
     RevisaoModelo --> ProfessorModelo : emailAutor
     RevisaoModelo --> AlunoModelo : emailAluno
+    DocumentoModelo --> ProfessorModelo : emailAutor
+    DocumentoModelo --> AlunoModelo : emailAluno
     NotificacaoModelo --> AlunoModelo : destinatário
     NotificacaoModelo --> AlunoModelo : remetente
     NotificacaoModelo --> ProfessorModelo : destinatário
