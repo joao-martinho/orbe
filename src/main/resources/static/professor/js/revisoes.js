@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnSair = document.getElementById('btnSair');
   const tabelaBody = document.querySelector('#tabelaEntregas tbody');
-  const mensagem = document.getElementById('mensagem');
   const formulario = document.getElementById('formularioEntrega');
   const selectAluno = document.getElementById('orientador');
 
@@ -43,29 +42,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tabelaBody.innerHTML = '';
 
-      documentos
+      const documentosFiltrados = documentos
         .filter(doc => doc.profTcc1 === true)
-        .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
-        .forEach(doc => {
-          const tr = document.createElement('tr');
+        .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
 
-          const dataFormatada = new Date(doc.criadoEm).toLocaleString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
+      for (const doc of documentosFiltrados) {
+        const tr = document.createElement('tr');
 
-          tr.innerHTML = `
-            <td>${doc.titulo}</td>
-            <td>${dataFormatada}</td>
-            <td>
-              <a href="/download/${doc.id}" class="btn btn-sm btn-primary">Baixar</a>
-            </td>
-          `;
-          tabelaBody.appendChild(tr);
+        const dataFormatada = new Date(doc.criadoEm).toLocaleString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
         });
+
+        const nomeAluno = await buscarNomeAluno(doc.emailAluno);
+
+        tr.innerHTML = `
+          <td>${doc.titulo}</td>
+          <td>${nomeAluno}</td>
+          <td>${dataFormatada}</td>
+          <td>
+            <a href="/download/${doc.id}" class="btn btn-sm btn-primary">Baixar</a>
+          </td>
+        `;
+        tabelaBody.appendChild(tr);
+      }
     } catch (error) {
       console.error(error);
     }

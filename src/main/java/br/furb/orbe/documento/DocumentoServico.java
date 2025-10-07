@@ -11,12 +11,22 @@ import java.util.stream.Collectors;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
+import br.furb.orbe.aluno.AlunoModelo;
+import br.furb.orbe.aluno.AlunoRepositorio;
+import br.furb.orbe.notificacao.NotificacaoModelo;
+import br.furb.orbe.notificacao.NotificacaoServico;
+import br.furb.orbe.professor.PapelProfessor;
+import br.furb.orbe.professor.ProfessorModelo;
+import br.furb.orbe.professor.ProfessorRepositorio;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class DocumentoServico {
+    private final NotificacaoServico notificacaoServico;
     private final DocumentoRepositorio documentoRepositorio;
+    private final AlunoRepositorio alunoRepositorio;
+    private final ProfessorRepositorio professorRepositorio;
     private final Path diretorio = Paths.get("uploads/documentos");
 
     public ResponseEntity<DocumentoModelo> cadastrar(DocumentoUploadDTO dto) throws IOException {
@@ -35,7 +45,70 @@ public class DocumentoServico {
         Documento.setProfTcc1(dto.isProfTcc1());
 
         DocumentoModelo salvo = documentoRepositorio.save(Documento);
+
+        ProfessorModelo autor = professorRepositorio.findByEmail(dto.getEmailAutor());
+        AlunoModelo alunoModelo = alunoRepositorio.findByEmail(salvo.getEmailAluno());
+        ProfessorModelo orientador = professorRepositorio.findByEmail(alunoModelo.getOrientador());
+        List<ProfessorModelo> professorModelos = professorRepositorio.findAll();
+        ProfessorModelo profTcc1 = new ProfessorModelo();
+
+        for (ProfessorModelo p: professorModelos) {
+            if (p.getPapeis().contains(PapelProfessor.PROF_TCC1)) {
+                profTcc1 = p;
+                break;
+            }
+        }
+
+        NotificacaoModelo notificacaoModelo = new NotificacaoModelo();
+
+        if (profTcc1.getEmail().equals(orientador.getEmail())) {
+            notificacaoModelo.setEmailDestinatario(profTcc1.getEmail());
+            notificacaoModelo.setTitulo("Documento enviado");
+            notificacaoModelo.setConteudo(
+                "O documento \"" + dto.getTitulo() + "\" foi enviado com sucesso."
+            );
+
+            notificacaoServico.cadastrarMensagem(notificacaoModelo);
+        }
+        else if (autor.getEmail().equals(profTcc1.getEmail())) {
+            notificacaoModelo.setEmailDestinatario(orientador.getEmail());
+            notificacaoModelo.setTitulo("Documento recebido");
+            notificacaoModelo.setConteudo(
+                "Você recebeu um novo documento: \"" + dto.getTitulo() + "\", referente ao aluno " + alunoModelo.getNome() + "."
+            );
+
+            notificacaoServico.cadastrarMensagem(notificacaoModelo);
+
+            notificacaoModelo.setEmailDestinatario(profTcc1.getEmail());
+            notificacaoModelo.setTitulo("Documento enviado");
+            notificacaoModelo.setConteudo(
+                "O documento \"" + dto.getTitulo() + "\" foi enviado com sucesso."
+            );
+
+            notificacaoServico.cadastrarMensagem(notificacaoModelo);
+            
+        }
+        else if (autor.getEmail().equals(orientador.getEmail())) {
+            notificacaoModelo.setEmailDestinatario(orientador.getEmail());
+            notificacaoModelo.setTitulo("Documento enviado");
+            notificacaoModelo.setConteudo(
+                "O documento \"" + dto.getTitulo() + "\" foi enviado com sucesso."
+            );
+
+            notificacaoServico.cadastrarMensagem(notificacaoModelo);
+
+            notificacaoModelo.setEmailDestinatario(profTcc1.getEmail());
+            notificacaoModelo.setTitulo("Documento recebido");
+            notificacaoModelo.setConteudo(
+                "Você recebeu um novo documento: \"" + dto.getTitulo() + "\", do professor " + orientador.getNome() + 
+                ", referente ao aluno " + alunoModelo.getNome() + "."
+            );
+
+            notificacaoServico.cadastrarMensagem(notificacaoModelo);
+        }
+        
         return ResponseEntity.status(201).body(salvo);
+
     }
 
     public ResponseEntity<byte[]> download(Long id) throws IOException {

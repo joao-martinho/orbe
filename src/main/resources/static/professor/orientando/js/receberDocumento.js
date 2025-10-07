@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const email = localStorage.getItem('orientando');
   if (!email) {
-    tabelaBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Email do aluno não encontrado.</td></tr>`;
     return;
   }
 
@@ -19,11 +18,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let documentos = await res.json();
 
-    // Filtra apenas os documentos com profTcc1 true
     const documentosFiltrados = documentos.filter(doc => doc.profTcc1 === true);
 
     if (!documentosFiltrados.length) {
-      tabelaBody.innerHTML = `<tr><td colspan="3" class="text-center">Nenhum documento encontrado.</td></tr>`;
       return;
     }
 
@@ -67,6 +64,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
   } catch (error) {
-    tabelaBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Erro ao carregar documentos: ${error.message}</td></tr>`;
+    console.log(error);
   }
 });

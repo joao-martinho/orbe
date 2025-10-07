@@ -19,11 +19,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  async function buscarNomeProfessor(email) {
+  async function buscarNomeAluno(email) {
     if (!email) return '—';
     try {
-      const res = await fetch(`/professores/${encodeURIComponent(email)}`);
-      if (!res.ok) throw new Error('Erro ao buscar professor.');
+      const res = await fetch(`/alunos/${encodeURIComponent(email)}`);
+      if (!res.ok) throw new Error('Erro ao buscar aluno.');
       const dados = await res.json();
       return dados.nome || '—';
     } catch (err) {
@@ -50,12 +50,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       tabelaBody.innerHTML = '';
       for (const entrega of entregasFiltradas) {
         const dataFormatada = formatDataHoraBR(new Date(entrega.criadoEm));
-        const nomeProfessor = await buscarNomeProfessor(entrega.emailAutor);
+        const nomeAluno = await buscarNomeAluno(entrega.emailAluno);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${entrega.titulo}</td>
-          <td>${nomeProfessor}</td>
+          <td>${nomeAluno}</td>
           <td>${dataFormatada}</td>
           <td>
             <a href="${entrega.linkDownload}" class="btn btn-primary btn-sm" download>Baixar</a>

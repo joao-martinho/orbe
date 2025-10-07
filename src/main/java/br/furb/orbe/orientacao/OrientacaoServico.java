@@ -80,7 +80,6 @@ public class OrientacaoServico {
 
         alunoRepositorio.save(aluno);
 
-        // Remove termo associado se existir
         TermoModelo termoModelo = termoRepositorio.findByEmailAluno(emailAlunoNorm);
         if (termoModelo != null) {
             removerTermo(termoModelo.getId());

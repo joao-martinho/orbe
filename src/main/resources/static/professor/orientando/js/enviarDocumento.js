@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const arquivo = document.getElementById('arquivo').files[0];
 
     if (!titulo || !arquivo) {
-      mensagem.innerHTML = `<div class="alert alert-warning">Título e arquivo são obrigatórios.</div>`;
       return;
     }
 

@@ -103,30 +103,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const body = document.createElement('div');
     body.className = 'card-body d-flex flex-column justify-content-between';
 
-    const nomes = aluno.nome.split(' ');
-    let exibicao;
-
-    if (nomes.length >= 2) {
-        const segundo = nomes[1].toLowerCase();
-        const primeirasPreposicoes = ['de', 'do', 'da', 'dos', 'das'];
-
-        if (primeirasPreposicoes.includes(segundo)) {
-            const terceiro = nomes[2] ? nomes[2][0] + '.' : '';
-            exibicao = `${nomes[0]} ${nomes[1]} ${terceiro}`;
-        } else {
-            exibicao = `${nomes[0]} ${nomes[1][0]}.`;
-        }
-    } else {
-        exibicao = nomes[0];
-    }
-
     const title = document.createElement('h5');
     title.className = 'card-title';
-    title.textContent = exibicao;
+    title.textContent = 'Aluno';
 
     const text = document.createElement('p');
     text.className = 'card-text text-muted';
-    text.textContent = `Clique para acompanhar o progresso do ${tipoOrientacao.toLowerCase()}.`;
+    text.textContent = 'Acompanhe o progresso de ' + aluno.nome + '.';
 
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'd-flex gap-2 mt-3';
@@ -161,6 +144,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     card.addEventListener('click', () => {
       localStorage.setItem('orientando', aluno.email);
+    });
+
+    card.addEventListener('click', () => {
+      localStorage.setItem('orientando', aluno.email);
+
+      if (tipoOrientacao.includes('Coorientando')) {
+        localStorage.setItem('isCoorientando', 'true');
+      } else {
+        localStorage.removeItem('isCoorientando');
+      }
     });
   }
 
