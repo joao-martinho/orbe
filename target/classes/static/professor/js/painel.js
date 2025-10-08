@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let label = null;
 
     if (role === 'prof_tcc1') label = 'Professor de TCC I';
+    if (role === 'prof_tcc2') label = 'Professor de TCC II';
     if (role === 'coord_bcc') label = 'Coordenador de BCC';
     if (role === 'coord_sis') label = 'Coordenador de SIS';
 

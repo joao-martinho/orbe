@@ -15,17 +15,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const emailAluno = localStorage.getItem('email');
 
   const camposNotas = [
-    { p: document.getElementById('textEmailAluno'), label: null, campo: 'nota1' },
-    { p: document.getElementById('textTelefoneAluno'), label: null, campo: 'nota2' },
-    { p: document.getElementById('textCurso'), label: null, campo: 'nota3' },
+    { p: document.getElementById('textEmailAluno'), campo: 'nota1' },
+    { p: document.getElementById('textTelefoneAluno'), campo: 'nota2' },
+    { p: document.getElementById('textCurso'), campo: 'nota3' },
   ];
 
-  const mediaFinalEl = document.getElementById('textTitulo');
+  const tituloEl = document.getElementById('titulo');
+  const orientadorEl = document.getElementById('orientador');
+  const mediaFinalEl = document.getElementById('textData');
+  const statusEl = document.getElementById('textStatus');
 
   try {
     const resBanca = await fetch(`/bancas/aluno/${emailAluno}`);
     if (!resBanca.ok) throw new Error('Erro ao buscar banca');
     const banca = await resBanca.json();
+
+    tituloEl.textContent = banca.titulo || '—';
+
+    if (banca.emailOrientador) {
+      const resOrientador = await fetch(`/professores/${banca.emailOrientador}`);
+      if (!resOrientador.ok) throw new Error('Erro ao buscar orientador');
+      const orientador = await resOrientador.json();
+      orientadorEl.textContent = orientador.nome || banca.emailOrientador;
+    } else {
+      orientadorEl.textContent = '—';
+    }
 
     const professoresEmails = [
       banca.emailProfessor1,
@@ -46,6 +60,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       mediaFinalEl.textContent = banca.mediaFinal.toFixed(2);
     } else {
       mediaFinalEl.textContent = '—';
+    }
+
+    const notas = [banca.nota1, banca.nota2, banca.nota3];
+    if (notas.some(n => !n || n === 0)) {
+      banca.status = 'pendente';
+      statusEl.innerHTML = '<span class="badge bg-warning text-dark">Pendente</span>';
+    } else if (banca.mediaFinal >= 6) {
+      banca.status = 'aprovado';
+      statusEl.innerHTML = '<span class="badge bg-success">Aprovado</span>';
+    } else {
+      banca.status = 'reprovado';
+      statusEl.innerHTML = '<span class="badge bg-danger">Reprovado</span>';
     }
 
   } catch (err) {

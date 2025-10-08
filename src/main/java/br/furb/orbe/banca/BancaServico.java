@@ -2,6 +2,7 @@ package br.furb.orbe.banca;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -63,6 +64,7 @@ public class BancaServico {
             if (bancaModelo.getNota2() != null) existente.setNota2(bancaModelo.getNota2());
             if (bancaModelo.getNota3() != null) existente.setNota3(bancaModelo.getNota3());
             if (bancaModelo.getMediaFinal() != null) existente.setMediaFinal(bancaModelo.getMediaFinal());
+            if (bancaModelo.getStatus() != null) existente.setStatus(bancaModelo.getStatus());
 
             boolean dataMarcadaAgora = bancaModelo.getData() != null && !bancaModelo.getData().equals(existente.getData());
             if (bancaModelo.getData() != null) existente.setData(bancaModelo.getData());
@@ -85,12 +87,11 @@ public class BancaServico {
                 AlunoModelo alunoModelo = alunoRepositorio.findByEmail(bancaModelo.getEmailAluno());
 
                 for (String email : emails) {
-                    
                     NotificacaoModelo notificacao = new NotificacaoModelo();
                     notificacao.setEmailDestinatario(email);
                     notificacao.setTitulo("Apresentação marcada");
                     notificacao.setConteudo("A apresentação do trabalho \"" + salvo.getTitulo() +
-                        "\", do aluno ou aluna " + alunoModelo.getNome() + ", foi marcada para " + 
+                        "\", do aluno " + alunoModelo.getNome() + ", foi marcada para " + 
                         salvo.getData().format(formatter) + " às " + salvo.getHora() + ".");
                     notificacaoServico.cadastrarMensagem(notificacao);
                 }
@@ -131,6 +132,7 @@ public class BancaServico {
         bancaModelo.setCurso(termoModelo.getCursoAluno());
         bancaModelo.setTitulo(termoModelo.getTitulo());
         bancaModelo.setResumo(termoModelo.getResumo());
+        bancaModelo.setStatus("pendente");
 
         bancaRepositorio.save(bancaModelo);
     }

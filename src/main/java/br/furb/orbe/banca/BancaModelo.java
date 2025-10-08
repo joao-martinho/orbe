@@ -66,4 +66,6 @@ public class BancaModelo {
 
     private Float mediaFinal;
 
+    private String status;
+
 }

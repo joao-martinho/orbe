@@ -71,26 +71,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function atualizarBotoes() {
     if (!btnAprovar && !btnDevolver) return;
+
+    const comentarioTextarea = document.querySelector('#comentarioContainer textarea');
+
     if (!termo) {
       if (btnAprovar) btnAprovar.disabled = true;
       if (btnDevolver) btnDevolver.disabled = true;
+      if (comentarioTextarea) comentarioTextarea.readOnly = true;
       return;
     }
 
     const email = emailUsuario;
+    let finalizado = true;
 
     if (email === termo.emailOrientador) {
-      const finalizado = termo.statusOrientador?.toLowerCase() !== 'pendente';
-      if (btnAprovar) btnAprovar.disabled = finalizado;
-      if (btnDevolver) btnDevolver.disabled = finalizado;
+      finalizado = termo.statusOrientador?.toLowerCase() !== 'pendente';
     } else if (email === termo.emailCoorientador) {
-      const finalizado = termo.statusCoorientador?.toLowerCase() !== 'pendente';
-      if (btnAprovar) btnAprovar.disabled = finalizado;
-      if (btnDevolver) btnDevolver.disabled = finalizado;
-    } else {
-      if (btnAprovar) btnAprovar.disabled = true;
-      if (btnDevolver) btnDevolver.disabled = true;
+      finalizado = termo.statusCoorientador?.toLowerCase() !== 'pendente';
     }
+
+    if (btnAprovar) btnAprovar.disabled = finalizado;
+    if (btnDevolver) btnDevolver.disabled = finalizado;
+    if (comentarioTextarea) comentarioTextarea.readOnly = finalizado;
   }
 
   async function buscarNomeProfessor(email) {

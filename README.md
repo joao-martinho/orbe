@@ -76,7 +76,8 @@ classDiagram
         -String semestre
         -String resumo
         -LocalDateTime criadoEm
-        -String status
+        -String situacao
+        -String comentario
     }
 
     class BancaModelo {
@@ -97,6 +98,7 @@ classDiagram
         -Float nota2
         -Float nota3
         -Float mediaFinal
+        -String situacao
     }
 
     class EntregaModelo {

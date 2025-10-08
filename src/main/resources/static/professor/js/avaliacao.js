@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const emailProfessorLogado = localStorage.getItem('email');
 
   const campoAluno = document.querySelector('#formNotas h5');
+  const tituloEl = document.getElementById('titulo');
+  const orientadorEl = document.getElementById('orientador');
+  const mediaEl = document.getElementById('mediaFinal');
+  const statusEl = document.getElementById('textStatus');
+
   const camposNotas = [
     { input: document.getElementById('nota1'), label: document.querySelector('label[for="nota1"]'), campo: 'nota1' },
     { input: document.getElementById('nota2'), label: document.querySelector('label[for="nota2"]'), campo: 'nota2' },
@@ -30,6 +35,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => div.innerHTML = '', 5000);
   }
 
+  function atualizarStatus(bancaObj) {
+    const notas = [bancaObj.nota1, bancaObj.nota2, bancaObj.nota3];
+    if (notas.some(n => !n || n === 0)) {
+      bancaObj.status = 'pendente';
+      statusEl.innerHTML = '<span class="badge bg-warning text-dark">Pendente</span>';
+    } else if (bancaObj.mediaFinal >= 6) {
+      bancaObj.status = 'aprovado';
+      statusEl.innerHTML = '<span class="badge bg-success">Aprovado</span>';
+    } else {
+      bancaObj.status = 'reprovado';
+      statusEl.innerHTML = '<span class="badge bg-danger">Reprovado</span>';
+    }
+  }
+
   try {
     const resAluno = await fetch(`/alunos/${emailAluno}`);
     if (!resAluno.ok) throw new Error('Erro ao buscar aluno');
@@ -39,6 +58,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resBanca = await fetch(`/bancas/aluno/${emailAluno}`);
     if (!resBanca.ok) throw new Error('Erro ao buscar banca');
     banca = await resBanca.json();
+
+    tituloEl.textContent = banca.titulo || '—';
+
+    if (banca.emailOrientador) {
+      const resOrientador = await fetch(`/professores/${banca.emailOrientador}`);
+      if (resOrientador.ok) {
+        const orientador = await resOrientador.json();
+        orientadorEl.textContent = orientador.nome || banca.emailOrientador;
+      } else {
+        orientadorEl.textContent = banca.emailOrientador;
+      }
+    } else {
+      orientadorEl.textContent = '—';
+    }
 
     const professoresEmails = [
       banca.emailProfessor1,
@@ -59,8 +92,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    if (banca.mediaFinal != null) {
-      document.getElementById('mediaFinal').textContent = banca.mediaFinal.toFixed(2);
+    mediaEl.textContent = banca.mediaFinal != null ? banca.mediaFinal.toFixed(2) : '—';
+
+    atualizarStatus(banca);
+
+    if (banca.status === 'aprovado' || banca.status === 'reprovado') {
+      camposNotas.forEach(c => c.input.disabled = true);
+      const btnSubmit = document.querySelector('#formNotas button[type="submit"]');
+      if (btnSubmit) btnSubmit.disabled = true;
     }
 
   } catch (err) {
@@ -92,6 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    if (banca.status === 'aprovado' || banca.status === 'reprovado') return;
+
     let notaAtualizada = null;
     let campoNota = null;
 
@@ -110,7 +151,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const bancaAtualizada = { ...banca, [campoNota]: notaAtualizada };
     bancaAtualizada.mediaFinal = calcularMedia(bancaAtualizada);
-    document.getElementById('mediaFinal').textContent = bancaAtualizada.mediaFinal.toFixed(2);
+    mediaEl.textContent = bancaAtualizada.mediaFinal.toFixed(2);
+
+    atualizarStatus(bancaAtualizada);
 
     try {
       const res = await fetch(`/bancas/${banca.id}`, {
@@ -122,6 +165,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!res.ok) throw new Error('Erro ao atualizar a banca');
       mostrarMensagem('Nota salva com sucesso.', 'success');
       banca = bancaAtualizada;
+
+      if (banca.status === 'aprovado' || banca.status === 'reprovado') {
+        camposNotas.forEach(c => c.input.disabled = true);
+        const btnSubmit = document.querySelector('#formNotas button[type="submit"]');
+        if (btnSubmit) btnSubmit.disabled = true;
+      }
+
     } catch (err) {
       console.error(err);
       mostrarMensagem('Ocorreu um erro ao salvar a nota.', 'danger');

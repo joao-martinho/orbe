@@ -114,6 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnDevolver.onclick = () => atualizarStatus(termo, 'devolvido');
   }
 
+
+
   async function buscarNomeProfessor(email) {
     if (!email) return '—';
     try {

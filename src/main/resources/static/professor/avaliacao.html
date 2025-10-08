@@ -23,6 +23,16 @@
     <h5 class="mb-4">Aluno: </h5>
 
     <div class="mb-3">
+      <label for="titulo" class="form-label"><strong>Título:</strong></label>
+      <p class="border-bottom pb-2" id="titulo">—</p>
+    </div>
+
+    <div class="mb-3">
+      <label for="orientador" class="form-label"><strong>Orientador:</strong></label>
+      <p class="border-bottom pb-2" id="orientador">—</p>
+    </div>
+
+    <div class="mb-3">
       <label for="nota1" class="form-label">Nota 1</label>
       <input type="number" step="0.1" class="form-control" id="nota1">
     </div>
@@ -37,14 +47,21 @@
       <input type="number" step="0.1" class="form-control" id="nota3">
     </div>
 
-    <div id="mediaFinalContainer" class="mb-3">
-      <label class="form-label">Média final:</label>
-      <div class="p-3 border rounded bg-light" id="mediaFinal"></div>
-    </div>
-
     <div class="mb-4">
       <button type="submit" class="btn btn-primary">Salvar</button>
     </div>
+
+    <div class="row">
+      <div id="mediaFinalContainer" class="col-md-6 mb-3">
+        <strong>Média final:</strong>
+        <p class="border-bottom pb-2" id="mediaFinal">—</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <strong>Situação:</strong>
+        <p id="textStatus" class="border-bottom pb-2">—</p>
+      </div>
+    </div>
+    
   </form>
 </div>
 
