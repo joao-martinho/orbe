@@ -92,6 +92,11 @@ classDiagram
         -String emailProfessor3
         -boolean marcada
         -LocalDate data
+        -LocalTime hora
+        -Float nota1
+        -Float nota2
+        -Float nota3
+        -Float mediaFinal
     }
 
     class EntregaModelo {
