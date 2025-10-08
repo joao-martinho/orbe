@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
     campos.semestre.disabled = readonly;
     campos.resumo.readOnly = readonly;
     campos.perfil.readOnly = readonly;
-    btnFinalizar.disabled = true;
   }
 
   async function buscarNomeProfessor(email) {
@@ -73,22 +72,45 @@ document.addEventListener('DOMContentLoaded', () => {
     termoInfo.termoAnoSemestre.textContent = `${termo.ano}/${termo.semestre}`;
     termoInfo.termoResumo.textContent = termo.resumo;
 
-    let status = termo.statusFinal || 'pendente';
+    let status = 'pendente';
+    if (
+      termo.statusOrientador === 'devolvido' ||
+      termo.statusCoorientador === 'devolvido' ||
+      termo.statusProfessorTcc1 === 'devolvido'
+    ) {
+      status = 'devolvido';
+    } else if (termo.statusFinal) {
+      status = termo.statusFinal;
+    }
+
     termoInfo.termoStatus.textContent = `Status: ${status}`;
     termoInfo.termoStatus.className = 'alert text-center';
 
     if (status === 'aprovado') {
       termoInfo.termoStatus.classList.add('alert-success');
       setCamposReadonly(true);
+      btnFinalizar.disabled = true;
     } else if (status === 'pendente') {
       termoInfo.termoStatus.classList.add('alert-warning');
       setCamposReadonly(true);
-    } else if (status === 'rejeitado') {
+      btnFinalizar.disabled = true;
+    } else if (status === 'devolvido') {
       termoInfo.termoStatus.classList.add('alert-danger');
       setCamposReadonly(false);
+      btnFinalizar.disabled = false;
     } else {
       termoInfo.termoStatus.classList.add('alert-secondary');
       setCamposReadonly(false);
+      btnFinalizar.disabled = false;
+    }
+
+    const comentarioContainer = document.getElementById('comentarioProfessorContainer');
+    const comentarioSpan = document.getElementById('comentarioProfessor');
+    if (termo.comentario && termo.comentario.trim() !== '') {
+      comentarioSpan.textContent = termo.comentario;
+      comentarioContainer.classList.remove('d-none');
+    } else {
+      comentarioContainer.classList.add('d-none');
     }
 
     visualizacaoTermo.classList.remove('d-none');
@@ -108,6 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       const aluno = await resAluno.json();
+
+      if (aluno.coorientadorProvisorio) {
+        perfilContainer.style.display = 'block';
+      } else {
+        perfilContainer.style.display = 'none';
+      }
 
       const resTermo = await fetch(`/termos/aluno/${encodeURIComponent(emailAluno)}`);
       if (resTermo.ok) {
@@ -157,7 +185,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Validar perfil apenas se houver coorientador provisório
       if (aluno.coorientadorProvisorio && !campos.perfil.value.trim()) {
         mensagem.innerHTML = `<div class="alert alert-danger">Preencha o perfil do coorientador.</div>`;
         return;

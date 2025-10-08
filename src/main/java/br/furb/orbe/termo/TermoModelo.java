@@ -65,5 +65,8 @@ public class TermoModelo {
     private String statusProfessorTcc1;
 
     private String statusFinal;
+
+    @Lob
+    private String comentario;
     
 }

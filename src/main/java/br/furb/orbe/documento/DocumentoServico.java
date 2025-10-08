@@ -112,16 +112,18 @@ public class DocumentoServico {
     }
 
     public ResponseEntity<byte[]> download(Long id) throws IOException {
-        DocumentoModelo Documento = new DocumentoModelo();
+        DocumentoModelo documento = documentoRepositorio.findById(id)
+            .orElseThrow(() -> new RuntimeException("Documento não encontrado."));
 
-        Path arquivo = diretorio.resolve(Documento.getNomeArquivo());
+        Path arquivo = diretorio.resolve(documento.getNomeArquivo());
         byte[] conteudo = Files.readAllBytes(arquivo);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + Documento.getNomeArquivo() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documento.getNomeArquivo() + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(conteudo);
     }
+
 
     public ResponseEntity<List<DocumentoDTO>> listarTodas() {
         List<DocumentoDTO> dtos = documentoRepositorio.findAll().stream()

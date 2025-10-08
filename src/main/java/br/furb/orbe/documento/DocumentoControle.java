@@ -37,6 +37,11 @@ public class DocumentoControle {
         return documentoServico.listarPorAluno(email);
     }
 
+    @GetMapping("/{id}/download")
+    public ResponseEntity<byte[]> download(@PathVariable Long id) throws IOException {
+        return documentoServico.download(id);
+    }
+
     @PostMapping
     public ResponseEntity<DocumentoModelo> cadastrar(@RequestBody DocumentoUploadDTO dto) throws IOException {
         return documentoServico.cadastrar(dto);

@@ -104,14 +104,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('modalNomeCoorientador').textContent = coorientadorNome;
 
     const btnAprovar = document.getElementById('btnSalvar');
-    const btnRejeitar = document.querySelector('#modalApresentacao .btn-danger');
+    const btnDevolver = document.querySelector('#modalApresentacao .btn-danger');
 
     const bloqueado = termo.statusFinal && termo.statusFinal.toLowerCase() !== 'pendente';
     btnAprovar.disabled = bloqueado;
-    btnRejeitar.disabled = bloqueado;
+    btnDevolver.disabled = bloqueado;
 
     btnAprovar.onclick = () => atualizarStatus(termo, 'aprovado');
-    btnRejeitar.onclick = () => atualizarStatus(termo, 'rejeitado');
+    btnDevolver.onclick = () => atualizarStatus(termo, 'devolvido');
   }
 
   async function buscarNomeProfessor(email) {
@@ -155,15 +155,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function criarBadgeStatus(status) {
     const s = (status || 'pendente').toLowerCase();
-    let badgeClass = 'bg-secondary';
+    let badgeClass = 'bg-warning text-dark';
     let texto = 'Pendente';
 
     if (s === 'aprovado') {
       badgeClass = 'bg-success';
       texto = 'Aprovado';
-    } else if (s === 'rejeitado') {
+    } else if (s === 'devolvido') {
       badgeClass = 'bg-danger';
-      texto = 'Rejeitado';
+      texto = 'Devolvido';
     } else if (s === 'pendente') {
       badgeClass = 'bg-warning text-dark';
       texto = 'Pendente';

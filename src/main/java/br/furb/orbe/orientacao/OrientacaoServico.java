@@ -185,16 +185,16 @@ public class OrientacaoServico {
         AlunoModelo aluno = alunoRepositorio.findByEmail(termoModelo.getEmailAluno());
         boolean coorientadorExiste = termoModelo.getEmailCoorientador() != null;
 
-        if ("rejeitado".equals(termoModelo.getStatusOrientador()) ||
-            "rejeitado".equals(termoModelo.getStatusCoorientador()) ||
-            "rejeitado".equals(termoModelo.getStatusProfessorTcc1())) {
-            termoModelo.setStatusFinal("rejeitado");
+        if ("devolvido".equals(termoModelo.getStatusOrientador()) ||
+            "devolvido".equals(termoModelo.getStatusCoorientador()) ||
+            "devolvido".equals(termoModelo.getStatusProfessorTcc1())) {
+            termoModelo.setStatusFinal("devolvido");
         } else if ("aprovado".equals(termoModelo.getStatusProfessorTcc1())) {
             termoModelo.setStatusFinal("aprovado");
         } else if (coorientadorExiste && "aprovado".equals(termoModelo.getStatusCoorientador())) {
-            termoModelo.setStatusFinal("em avaliação professor");
+            termoModelo.setStatusFinal("pendente");
         } else if (!coorientadorExiste && "aprovado".equals(termoModelo.getStatusOrientador())) {
-            termoModelo.setStatusFinal("em avaliação professor");
+            termoModelo.setStatusFinal("pendente");
         } else {
             termoModelo.setStatusFinal("pendente");
         }

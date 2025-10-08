@@ -88,11 +88,12 @@ public class TermoServico {
         if (termoModelo.getStatusCoorientador() != null) termoExistente.setStatusCoorientador(termoModelo.getStatusCoorientador());
         if (termoModelo.getStatusProfessorTcc1() != null) termoExistente.setStatusProfessorTcc1(termoModelo.getStatusProfessorTcc1());
         if (termoModelo.getStatusFinal() != null) termoExistente.setStatusFinal(termoModelo.getStatusFinal());
+        if (termoModelo.getComentario() != null) termoExistente.setComentario(termoModelo.getComentario());
 
-        if ("rejeitado".equals(termoExistente.getStatusOrientador()) ||
-            "rejeitado".equals(termoExistente.getStatusCoorientador()) ||
-            "rejeitado".equals(termoExistente.getStatusProfessorTcc1())) {
-            termoExistente.setStatusFinal("rejeitado");
+        if ("devolvido".equals(termoExistente.getStatusOrientador()) ||
+            "devolvido".equals(termoExistente.getStatusCoorientador()) ||
+            "devolvido".equals(termoExistente.getStatusProfessorTcc1())) {
+            termoExistente.setStatusFinal("devolvido");
         } else if ("aprovado".equals(termoExistente.getStatusProfessorTcc1())) {
             termoExistente.setStatusFinal("aprovado");
         } else {
@@ -101,16 +102,16 @@ public class TermoServico {
 
         TermoModelo salvo = termoRepositorio.save(termoExistente);
 
-        if ("aprovado".equals(termoExistente.getStatusFinal()) || "rejeitado".equals(termoExistente.getStatusFinal())) {
+        if ("aprovado".equals(termoExistente.getStatusFinal()) || "devolvido".equals(termoExistente.getStatusFinal())) {
             orientacaoServico.aprovarTermo(termoExistente);
             if ("aprovado".equals(termoExistente.getStatusFinal())) {
                 bancaServico.criarAPartirDoTermo(salvo);
             }
 
-            String tituloAluno = "aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado 🎉" : "Termo rejeitado 🙁";
+            String tituloAluno = "aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado 🎉" : "Termo devolvido 🙁";
             String conteudoAluno = "aprovado".equals(termoExistente.getStatusFinal()) ?
                     "O seu termo de compromisso foi aprovado." :
-                    "O seu termo de compromisso foi rejeitado. Procure o seu orientador.";
+                    "O seu termo de compromisso foi devolvido. Verifique a seção \"comentário\" na página do termo ou converse com o seu orientador.";
 
             NotificacaoModelo notificacaoAluno = new NotificacaoModelo();
             notificacaoAluno.setEmailDestinatario(termoExistente.getEmailAluno());
@@ -129,9 +130,8 @@ public class TermoServico {
             for (String email : emailsProfessores) {
                 NotificacaoModelo notificacaoProf = new NotificacaoModelo();
                 notificacaoProf.setEmailDestinatario(email);
-                notificacaoProf.setTitulo("aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado" : "Termo rejeitado");
-                notificacaoProf.setConteudo("Você " + ("aprovado".equals(termoExistente.getStatusFinal()) ? "aprovou" : "rejeitou") +
-                        " o termo do aluno " + termoExistente.getNomeAluno() + ".");
+                notificacaoProf.setTitulo("aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado" : "Termo devolvido");
+                notificacaoProf.setConteudo("O termo de compromisso do aluno " + termoExistente.getNomeAluno() + ("aprovado".equals(termoExistente.getStatusFinal()) ? "aprovado." : "devolvido."));
                 notificacaoServico.cadastrarMensagem(notificacaoProf);
             }
         }

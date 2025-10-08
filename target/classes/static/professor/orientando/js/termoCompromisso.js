@@ -12,9 +12,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const elPerfilCoorientador = document.getElementById('textPerfilCoorientador');
   const elData = document.getElementById('textData');
   const elStatus = document.getElementById('textStatus');
+  const comentarioContainer = document.getElementById('comentario');
 
   const btnAprovar = document.getElementById('btnAprovar');
-  const btnRejeitar = document.getElementById('btnRejeitar');
+  const btnDevolver = document.getElementById('btnDevolver');
 
   let termo = null;
   let acaoAtual = null;
@@ -38,9 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (s === 'aprovado') {
       badgeClass = 'bg-success';
       texto = 'Aprovado';
-    } else if (s === 'rejeitado') {
+    } else if (s === 'devolvido') {
       badgeClass = 'bg-danger';
-      texto = 'Rejeitado';
+      texto = 'Devolvido';
     } else if (s === 'pendente') {
       badgeClass = 'bg-warning text-dark';
       texto = 'Pendente';
@@ -60,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (elCoorientador) elCoorientador.textContent = await buscarNomeProfessor(t.emailCoorientador);
     if (elPerfilCoorientador) elPerfilCoorientador.textContent = t.perfilCoorientador || '—';
     if (elData) elData.textContent = t.criadoEm ? formatarData(t.criadoEm) : '—';
+    if (comentarioContainer) comentarioContainer.value = t.comentario || '';
 
     const statusParaBadge = t.statusProfessorTcc1 || 'pendente';
     atualizarBadgeStatus(statusParaBadge);
@@ -68,10 +70,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function atualizarBotoes() {
-    if (!btnAprovar && !btnRejeitar) return;
+    if (!btnAprovar && !btnDevolver) return;
     if (!termo) {
       if (btnAprovar) btnAprovar.disabled = true;
-      if (btnRejeitar) btnRejeitar.disabled = true;
+      if (btnDevolver) btnDevolver.disabled = true;
       return;
     }
 
@@ -80,14 +82,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (email === termo.emailOrientador) {
       const finalizado = termo.statusOrientador?.toLowerCase() !== 'pendente';
       if (btnAprovar) btnAprovar.disabled = finalizado;
-      if (btnRejeitar) btnRejeitar.disabled = finalizado;
+      if (btnDevolver) btnDevolver.disabled = finalizado;
     } else if (email === termo.emailCoorientador) {
       const finalizado = termo.statusCoorientador?.toLowerCase() !== 'pendente';
       if (btnAprovar) btnAprovar.disabled = finalizado;
-      if (btnRejeitar) btnRejeitar.disabled = finalizado;
+      if (btnDevolver) btnDevolver.disabled = finalizado;
     } else {
       if (btnAprovar) btnAprovar.disabled = true;
-      if (btnRejeitar) btnRejeitar.disabled = true;
+      if (btnDevolver) btnDevolver.disabled = true;
     }
   }
 
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function buscarTermo(email) {
     try {
-      const res = await fetch(`/termos/aluno/${encodeURIComponent(email)}?t=${Date.now()}`); // evita cache
+      const res = await fetch(`/termos/aluno/${encodeURIComponent(email)}?t=${Date.now()}`);
       if (!res.ok) throw new Error('Erro ao buscar termo');
       return await res.json();
     } catch (error) {
@@ -141,10 +143,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function aprovar() {
     if (!termo) return;
 
+    const comentario = comentarioContainer ? comentarioContainer.value.trim() : '';
+
     if (emailUsuario === termo.emailOrientador && termo.statusOrientador === 'pendente') {
       const payload = termo.emailCoorientador
-        ? { statusOrientador: 'aprovado' }
-        : { statusOrientador: 'aprovado', statusCoorientador: 'aprovado'};
+        ? { statusOrientador: 'aprovado', comentario: comentario }
+        : { statusOrientador: 'aprovado', statusCoorientador: 'aprovado', comentario: comentario };
 
       await atualizarTermo(termo.id, payload);
       await refreshTermo();
@@ -152,20 +156,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (emailUsuario === termo.emailCoorientador && termo.statusOrientador === 'aprovado') {
-      await atualizarTermo(termo.id, { statusCoorientador: 'aprovado'});
+      await atualizarTermo(termo.id, { statusCoorientador: 'aprovado', comentario: comentario });
       await refreshTermo();
     }
-    
   }
 
-  async function rejeitar() {
+  async function devolver() {
     if (!termo) return;
+
+    const comentario = comentarioContainer ? comentarioContainer.value.trim() : '';
 
     if (emailUsuario === termo.emailOrientador && termo.statusOrientador === 'pendente') {
       const payload = {
-        statusOrientador: 'rejeitado',
-        statusFinal: 'rejeitado',
-        statusProfessorTcc1: 'rejeitado'
+        statusOrientador: 'devolvido',
+        statusFinal: 'devolvido',
+        statusProfessorTcc1: 'devolvido',
+        comentario: comentario
       };
       await atualizarTermo(termo.id, payload);
       await refreshTermo();
@@ -173,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (emailUsuario === termo.emailCoorientador && termo.statusOrientador === 'aprovado') {
-      await atualizarTermo(termo.id, { statusFinal: 'rejeitado', statusProfessorTcc1: 'rejeitado' });
+      await atualizarTermo(termo.id, { statusFinal: 'devolvido', statusProfessorTcc1: 'devolvido', comentario: comentario });
       await refreshTermo();
     }
   }
@@ -202,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function mostrarModalConfirmacao(acao) {
     acaoAtual = acao;
     const modalBody = modalEl.querySelector('.modal-body');
-    modalBody.textContent = `Tem certeza de que deseja ${acao === 'aprovar' ? 'APROVAR' : 'REJEITAR'} este termo de compromisso?`;
+    modalBody.textContent = `Tem certeza de que deseja ${acao === 'aprovar' ? 'aprovar' : 'devolver'} este termo de compromisso?`;
     modalInstance.show();
   }
 
@@ -211,13 +217,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnConfirmar.addEventListener('click', async () => {
       modalInstance.hide();
       if (acaoAtual === 'aprovar') await aprovar();
-      else if (acaoAtual === 'rejeitar') await rejeitar();
+      else if (acaoAtual === 'devolver') await devolver();
       acaoAtual = null;
     });
   }
 
   if (btnAprovar) btnAprovar.addEventListener('click', () => mostrarModalConfirmacao('aprovar'));
-  if (btnRejeitar) btnRejeitar.addEventListener('click', () => mostrarModalConfirmacao('rejeitar'));
+  if (btnDevolver) btnDevolver.addEventListener('click', () => mostrarModalConfirmacao('devolver'));
 
   termo = await buscarTermo(emailAluno);
   if (termo) await povoarCampos(termo);

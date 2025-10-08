@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${nomeAluno}</td>
           <td>${dataFormatada}</td>
           <td>
-            <a href="/download/${doc.id}" class="btn btn-sm btn-primary">Baixar</a>
+            <a href="/documentos/${doc.id}/download" class="btn btn-sm btn-primary">Baixar</a>
           </td>
         `;
         tabelaBody.appendChild(tr);

@@ -20,7 +20,7 @@ public class DocumentoDTO {
         this.emailAluno = modelo.getEmailAluno();
         this.nomeArquivo = modelo.getNomeArquivo();
         this.criadoEm = modelo.getCriadoEm().toString();
-        this.linkDownload = "/documentos/" + modelo.getId() + "/download";
         this.profTcc1 = modelo.isProfTcc1();
+        this.linkDownload = "/documentos/" + modelo.getId() + "/download";
     }
 }

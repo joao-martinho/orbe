@@ -47,7 +47,7 @@
 
     <div class="mb-3" id="perfilContainer" style="display:none;">
       <label for="perfil" class="form-label">Perfil do coorientador (menos de 500 caracteres)</label>
-      <textarea class="form-control" id="perfil" rows="4"></textarea>
+      <textarea class="form-control" id="perfil" rows="4" placeholder="Digite o perfil do coorientador"></textarea>
     </div>
 
     <div class="mb-3">
@@ -67,6 +67,12 @@
     <p id="termoCoorientadorContainer"><strong>Coorientador:</strong> <span id="termoCoorientador"></span></p>
     <p><strong>Semestre em que cursará TCC II:</strong> <span id="termoAnoSemestre"></span></p>
     <p><strong>Resumo:</strong> <span id="termoResumo"></span></p>
+
+    <div id="comentarioProfessorContainer" class="mb-3 d-none">
+      <label class="form-label"><strong>Comentário:</strong></label>
+      <div class="p-3 border rounded bg-light" id="comentarioProfessor"></div>
+    </div>
+
     <div id="termoStatus" class="alert text-center" role="alert"></div>
   </div>
 
