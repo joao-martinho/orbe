@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const row = document.querySelector('.row');
+
   if (!row) {
     console.error('Container .row não encontrado!');
     return;
@@ -105,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const title = document.createElement('h5');
     title.className = 'card-title';
-    title.textContent = 'Aluno';
+    title.textContent = 'Orientando';
 
     const text = document.createElement('p');
     text.className = 'card-text text-muted';
@@ -245,6 +246,71 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  async function carregarBancas(email, row) {
+    try {
+      const response = await fetch('/bancas');
+      if (!response.ok) throw new Error('Erro ao carregar bancas');
+
+      const bancas = await response.json();
+      const bancasDoUsuario = bancas.filter(banca =>
+        banca.emailProfessor1 === email ||
+        banca.emailProfessor2 === email ||
+        banca.emailProfessor3 === email
+      );
+
+      for (const banca of bancasDoUsuario) {
+        let alunoNome = banca.emailAluno;
+        try {
+          const resAluno = await fetch(`/alunos/${encodeURIComponent(banca.emailAluno)}`);
+          if (resAluno.ok) {
+            const alunoData = await resAluno.json();
+            if (alunoData.nome) alunoNome = alunoData.nome;
+          }
+        } catch (err) {
+          console.warn('Não foi possível buscar o nome do aluno, usando email.', err);
+        }
+
+        const col = document.createElement('div');
+        col.className = 'col';
+        col.style.display = 'block';
+
+        const card = document.createElement('div');
+        card.className = 'card h-100 shadow-sm position-relative';
+
+        const body = document.createElement('div');
+        body.className = 'card-body d-flex flex-column justify-content-between';
+
+        const title = document.createElement('h5');
+        title.className = 'card-title';
+        title.textContent = 'Banca de avaliação';
+
+        const text = document.createElement('p');
+        text.className = 'card-text text-muted';
+        text.textContent = `Acesse informações sobre a banca do aluno ${alunoNome}.`;
+
+        const link = document.createElement('a');
+        link.href = './avaliacao.html';
+        link.className = 'btn btn-primary mt-3';
+        link.textContent = 'Acessar';
+        link.addEventListener('click', () => {
+          localStorage.setItem('avaliando', banca.emailAluno);
+        });
+
+        body.appendChild(title);
+        body.appendChild(text);
+        body.appendChild(link);
+
+        card.appendChild(body);
+        col.appendChild(card);
+        row.appendChild(col);
+      }
+
+    } catch (err) {
+      console.error('Erro ao carregar bancas:', err);
+    }
+  }
+
+  await carregarBancas(email, row);
   await atualizarBadgeMensagens();
 
 });

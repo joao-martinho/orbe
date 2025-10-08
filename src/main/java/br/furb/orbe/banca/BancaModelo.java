@@ -58,4 +58,12 @@ public class BancaModelo {
 
     private LocalTime hora;
 
+    private Float nota1;
+
+    private Float nota2;
+
+    private Float nota3;
+
+    private Float mediaFinal;
+
 }

@@ -38,6 +38,11 @@ public class BancaControle {
         return this.BancaServico.buscarBanca(id);
     }
 
+    @GetMapping("/aluno/{email}")
+    public ResponseEntity<BancaModelo> buscarPorAluno(@PathVariable String email) {
+        return this.BancaServico.buscarPorAluno(email);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<BancaModelo> alterarBancaTotal(@Valid @PathVariable Long id, @RequestBody BancaModelo bancaModelo) {
         return this.BancaServico.alterarBancaTotal(id, bancaModelo);

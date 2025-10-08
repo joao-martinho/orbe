@@ -59,6 +59,10 @@ public class BancaServico {
             if (bancaModelo.getEmailProfessor1() != null) existente.setEmailProfessor1(bancaModelo.getEmailProfessor1());
             if (bancaModelo.getEmailProfessor2() != null) existente.setEmailProfessor2(bancaModelo.getEmailProfessor2());
             if (bancaModelo.getEmailProfessor3() != null) existente.setEmailProfessor3(bancaModelo.getEmailProfessor3());
+            if (bancaModelo.getNota1() != null) existente.setNota1(bancaModelo.getNota1());
+            if (bancaModelo.getNota2() != null) existente.setNota2(bancaModelo.getNota2());
+            if (bancaModelo.getNota3() != null) existente.setNota3(bancaModelo.getNota3());
+            if (bancaModelo.getMediaFinal() != null) existente.setMediaFinal(bancaModelo.getMediaFinal());
 
             boolean dataMarcadaAgora = bancaModelo.getData() != null && !bancaModelo.getData().equals(existente.getData());
             if (bancaModelo.getData() != null) existente.setData(bancaModelo.getData());
@@ -129,6 +133,12 @@ public class BancaServico {
         bancaModelo.setResumo(termoModelo.getResumo());
 
         bancaRepositorio.save(bancaModelo);
+    }
+
+    public ResponseEntity<BancaModelo> buscarPorAluno(String email) {
+        Optional<BancaModelo> optional = bancaRepositorio.findByEmailAluno(email);
+        return optional.map(Banca -> new ResponseEntity<>(Banca, HttpStatus.OK))
+                       .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 }
