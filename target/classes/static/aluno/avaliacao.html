@@ -8,44 +8,35 @@
   <title>Nota da apresentação - Orbe</title>
 </head>
 <body class="bg-light">
-
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <a href="painel.html" class="btn btn-secondary">← Voltar ao painel</a>
     <button id="btnSair" class="btn btn-danger">Sair</button>
   </div>
-  
+
   <h1 class="mb-4 text-center">Nota da apresentação</h1>
 
-  <div id="mensagens" class="mb-3"></div>
-
-  <form id="formNotas" class="card p-4 shadow-sm mb-5">
-    <h5 class="mb-4">Aluno: </h5>
-
+<div class="card shadow-sm p-4 mb-4">
     <div class="mb-3">
-      <label for="nota1" class="form-label">Nota 1</label>
-      <input type="number" step="0.1" class="form-control" id="nota1">
+    <strong>Nota 1:</strong>
+    <p id="textEmailAluno" class="border-bottom pb-2">—</p>
     </div>
 
     <div class="mb-3">
-      <label for="nota2" class="form-label">Nota 2</label>
-      <input type="number" step="0.1" class="form-control" id="nota2">
+    <strong>Nota 2:</strong>
+    <p id="textTelefoneAluno" class="border-bottom pb-2">—</p>
     </div>
 
     <div class="mb-3">
-      <label for="nota3" class="form-label">Nota 3</label>
-      <input type="number" step="0.1" class="form-control" id="nota3">
+    <strong>Nota 3:</strong>
+    <p id="textCurso" class="border-bottom pb-2">—</p>
     </div>
 
-    <div id="mediaFinalContainer" class="mb-3">
-      <label class="form-label">Média final:</label>
-      <div class="p-3 border rounded bg-light" id="mediaFinal"></div>
+    <div class="mb-3">
+    <strong>Média final:</strong>
+    <p id="textTitulo" class="border-bottom pb-2">—</p>
     </div>
 
-    <div class="mb-4">
-      <button type="submit" class="btn btn-primary">Salvar</button>
-    </div>
-  </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>

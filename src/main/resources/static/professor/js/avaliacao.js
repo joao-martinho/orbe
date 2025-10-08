@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-	if (tipo !== 'professor') {
-		alert('Você não tem permissão para acessar esta página :(');
-		window.location.href = '../login.html';
-	}
+  if (tipo !== 'professor') {
+    mostrarMensagem('Você não tem permissão para acessar esta página :(', 'danger');
+    window.location.href = '../login.html';
+  }
 
   const btnSair = document.getElementById('btnSair');
   btnSair.addEventListener('click', () => {
@@ -16,20 +16,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const campoAluno = document.querySelector('#formNotas h5');
   const camposNotas = [
-    { input: document.getElementById('nota1'), label: document.querySelector('label[for="nota1"]') },
-    { input: document.getElementById('nota2'), label: document.querySelector('label[for="nota2"]') },
-    { input: document.getElementById('nota3'), label: document.querySelector('label[for="nota3"]') },
+    { input: document.getElementById('nota1'), label: document.querySelector('label[for="nota1"]'), campo: 'nota1' },
+    { input: document.getElementById('nota2'), label: document.querySelector('label[for="nota2"]'), campo: 'nota2' },
+    { input: document.getElementById('nota3'), label: document.querySelector('label[for="nota3"]'), campo: 'nota3' },
   ];
+
+  let banca;
+  let aluno;
+
+  function mostrarMensagem(texto, tipo='success') {
+    const div = document.getElementById('mensagens');
+    div.innerHTML = `<div class="alert alert-${tipo}" role="alert">${texto}</div>`;
+    setTimeout(() => div.innerHTML = '', 5000);
+  }
 
   try {
     const resAluno = await fetch(`/alunos/${emailAluno}`);
     if (!resAluno.ok) throw new Error('Erro ao buscar aluno');
-    const aluno = await resAluno.json();
+    aluno = await resAluno.json();
     campoAluno.textContent = `Aluno: ${aluno.nome}`;
 
     const resBanca = await fetch(`/bancas/aluno/${emailAluno}`);
     if (!resBanca.ok) throw new Error('Erro ao buscar banca');
-    const banca = await resBanca.json();
+    banca = await resBanca.json();
 
     const professoresEmails = [
       banca.emailProfessor1,
@@ -43,13 +52,79 @@ document.addEventListener('DOMContentLoaded', async () => {
       const prof = await resProf.json();
 
       camposNotas[i].label.textContent = `Nota ${i + 1} - ${prof.nome}`;
+      camposNotas[i].input.value = banca[camposNotas[i].campo] ?? '';
 
       if (professoresEmails[i] !== emailProfessorLogado) {
         camposNotas[i].input.readOnly = true;
       }
     }
+
+    if (banca.mediaFinal != null) {
+      document.getElementById('mediaFinal').textContent = banca.mediaFinal.toFixed(2);
+    }
+
   } catch (err) {
     console.error(err);
-    alert('Ocorreu um erro ao carregar os dados.');
+    mostrarMensagem('Ocorreu um erro ao carregar os dados.', 'danger');
   }
+
+  function calcularMedia(bancaObj) {
+    const n1 = bancaObj.nota1 ?? 0;
+    const n2 = bancaObj.nota2 ?? 0;
+    const n3 = bancaObj.nota3 ?? 0;
+    let media = 0;
+
+    if (!aluno || !aluno.curso) return 0;
+
+    if (aluno.curso === 'BCC') {
+      media = (n1 * 0.1) + (n2 * 0.2) + (n3 * 0.1) + (n1 * 0.2) + (n2 * 0.4);
+    } else if (aluno.curso === 'SIS') {
+      media = (n1 * 0.1) + (n2 * 0.2) + (n1 * 0.25) + (n2 * 0.45);
+    } else {
+      const notasValidas = [n1, n2, n3].filter(n => n != null && !isNaN(n));
+      media = notasValidas.length > 0 ? notasValidas.reduce((a,b)=>a+b,0)/notasValidas.length : 0;
+    }
+
+    return media;
+  }
+
+  const form = document.getElementById('formNotas');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    let notaAtualizada = null;
+    let campoNota = null;
+
+    for (let i = 0; i < 3; i++) {
+      if (!camposNotas[i].input.readOnly) {
+        notaAtualizada = parseFloat(camposNotas[i].input.value);
+        campoNota = camposNotas[i].campo;
+        break;
+      }
+    }
+
+    if (notaAtualizada == null || isNaN(notaAtualizada)) {
+      mostrarMensagem('Nota inválida.', 'danger');
+      return;
+    }
+
+    const bancaAtualizada = { ...banca, [campoNota]: notaAtualizada };
+    bancaAtualizada.mediaFinal = calcularMedia(bancaAtualizada);
+    document.getElementById('mediaFinal').textContent = bancaAtualizada.mediaFinal.toFixed(2);
+
+    try {
+      const res = await fetch(`/bancas/${banca.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bancaAtualizada)
+      });
+
+      if (!res.ok) throw new Error('Erro ao atualizar a banca');
+      mostrarMensagem('Nota salva com sucesso.', 'success');
+      banca = bancaAtualizada;
+    } catch (err) {
+      console.error(err);
+      mostrarMensagem('Ocorreu um erro ao salvar a nota.', 'danger');
+    }
+  });
 });

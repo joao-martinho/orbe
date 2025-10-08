@@ -54,22 +54,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cardTermo = document.getElementById('card-termo');
         const cardEntregas = document.getElementById('card-entregas');
         const cardRevisao = document.getElementById('card-revisao');
+        const cardAvaliacao = document.getElementById('card-avaliacao'); // novo card
 
         if (!aluno.orientador && !aluno.orientadorProvisorio) {
             cardEscolherOrientador.classList.remove('grayed-out');
             cardTermo.classList.add('grayed-out');
             cardEntregas.classList.add('grayed-out');
             cardRevisao.classList.add('grayed-out');
+            cardAvaliacao.classList.add('grayed-out');
         } else if (!aluno.orientador && aluno.orientadorProvisorio) {
             cardEscolherOrientador.classList.remove('grayed-out');
             cardTermo.classList.remove('grayed-out');
             cardEntregas.classList.add('grayed-out');
             cardRevisao.classList.add('grayed-out');
+            cardAvaliacao.classList.add('grayed-out');
         } else if (aluno.orientador) {
             cardEscolherOrientador.classList.add('grayed-out');
             cardTermo.classList.remove('grayed-out');
             cardEntregas.classList.remove('grayed-out');
             cardRevisao.classList.remove('grayed-out');
+            cardAvaliacao.classList.remove('grayed-out');
         }
 
     } catch (error) {
