@@ -118,17 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function carregarTermo() {
     const emailAluno = localStorage.getItem('email');
-    if (!emailAluno) {
-      mensagem.innerHTML = `<div class="alert alert-danger">Usuário não autenticado.</div>`;
-      return;
-    }
 
     try {
       const resAluno = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
-      if (!resAluno.ok) {
-        mensagem.innerHTML = `<div class="alert alert-danger">Erro ao buscar dados do aluno: ${resAluno.statusText}</div>`;
-        return;
-      }
       const aluno = await resAluno.json();
 
       if (aluno.coorientadorProvisorio) {
@@ -167,28 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function enviarTermo() {
     const emailAluno = localStorage.getItem('email');
-    if (!emailAluno) {
-      mensagem.innerHTML = `<div class="alert alert-danger">Usuário não autenticado (email não encontrado).</div>`;
-      return;
-    }
 
     try {
       const resAluno = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
-      if (!resAluno.ok) {
-        mensagem.innerHTML = `<div class="alert alert-danger">Erro ao buscar dados do aluno: ${resAluno.statusText}</div>`;
-        return;
-      }
       const aluno = await resAluno.json();
-
-      if (!campos.titulo.value.trim() || !campos.ano.value || !campos.semestre.value || !campos.resumo.value.trim()) {
-        mensagem.innerHTML = `<div class="alert alert-danger">Preencha todos os campos obrigatórios do formulário.</div>`;
-        return;
-      }
-
-      if (aluno.coorientadorProvisorio && !campos.perfil.value.trim()) {
-        mensagem.innerHTML = `<div class="alert alert-danger">Preencha o perfil do coorientador.</div>`;
-        return;
-      }
 
       const data = new Date();
       const offset = 3 * 60;
@@ -238,11 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const resText = await resPost.text();
       if (resText) termoSalvo = JSON.parse(resText);
 
-      mensagem.innerHTML = `<div class="alert alert-success">Termo enviado com sucesso.</div>`;
+      mensagem.innerHTML = `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>`;
       if (termoSalvo) atualizarVisualizacaoTermo(termoSalvo);
 
     } catch (error) {
-      mensagem.innerHTML = `<div class="alert alert-danger">Erro na conexão: ${error.message}</div>`;
+      console.log(error)
     }
   }
 

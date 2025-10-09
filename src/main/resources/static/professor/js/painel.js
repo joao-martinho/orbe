@@ -291,7 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const link = document.createElement('a');
         link.href = './avaliacao.html';
-        link.className = 'btn btn-warning mt-3';
+        link.className = 'btn btn-primary mt-3';
         link.textContent = 'Acessar';
         link.addEventListener('click', () => {
           localStorage.setItem('avaliando', banca.emailAluno);

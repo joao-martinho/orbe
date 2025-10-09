@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resBanca = await fetch(`/bancas/aluno/${emailAluno}`);
     if (!resBanca.ok) throw new Error('Erro ao buscar banca');
     const banca = await resBanca.json();
-
     tituloEl.textContent = banca.titulo || '—';
 
     if (banca.emailOrientador) {
@@ -40,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       orientadorEl.textContent = '—';
     }
+
+    const dataEHoraEl = document.getElementById('dataEHora');
+    dataEHoraEl.textContent = formatarDataEHora(banca.data, banca.hora);
 
     const professoresEmails = [
       banca.emailProfessor1,
@@ -77,4 +79,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (err) {
     console.error(err);
   }
+
+  function formatarDataEHora(dataStr, horaStr) {
+    if (!dataStr) return '—';
+    const [ano, mes, dia] = dataStr.split('-');
+    let [h, m] = horaStr ? horaStr.split(':') : ['00','00'];
+    return `${dia.padStart(2,'0')}/${mes.padStart(2,'0')}/${ano}, ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
+  }
+
 });

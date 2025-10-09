@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   checkCoorientador.addEventListener('change', () => {
     if (checkCoorientador.checked) {
       coorientadorContainer.style.display = 'block';
+      selectCoorientador.required = true;
       requestAnimationFrame(() => {
         coorientadorContainer.style.maxHeight = coorientadorContainer.scrollHeight + 'px';
         coorientadorContainer.style.opacity = '1';
@@ -48,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       coorientadorContainer.style.maxHeight = '0';
       coorientadorContainer.style.opacity = '0';
+      selectCoorientador.required = false;
       setTimeout(() => {
         if (!checkCoorientador.checked) {
           coorientadorContainer.style.display = 'none';
@@ -116,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     })
     .catch(err => {
-      mensagem.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+      console.log(err);
     });
 
   form.addEventListener('submit', async (event) => {
@@ -125,13 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const coorientadorEmailSelecionado = checkCoorientador.checked ? selectCoorientador.value : null;
 
     if (!orientadorEmailSelecionado) {
-      mensagem.innerHTML = '<div class="alert alert-warning">Por favor, selecione um orientador.</div>';
       visualizacao.style.display = 'none';
       return;
     }
 
     if (coorientadorEmailSelecionado && coorientadorEmailSelecionado === orientadorEmailSelecionado) {
-      mensagem.innerHTML = '<div class="alert alert-warning">O coorientador não pode ser o mesmo que o orientador.</div>';
+      mensagem.innerHTML = '<div class="alert alert-danger">O coorientador não pode ser o mesmo que o orientador.</div>';
       return;
     }
 
@@ -175,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
       selectCoorientador.disabled = true;
 
     } catch (error) {
-      mensagem.innerHTML = `<div class="alert alert-danger">${error.message}</div>`;
+      console.log(error);
       visualizacao.style.display = 'none';
     }
   });
@@ -204,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnRemover?.addEventListener('click', () => {
     if (!orientadorEmail) {
-      mensagem.innerHTML = '<div class="alert alert-warning">Nenhum orientador para remover.</div>';
       return;
     }
     modalConfirm.show();
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
       form.querySelector('button[type="submit"]').disabled = false;
 
     } catch (err) {
-      mensagem.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+      console.log(err);
     }
   });
 

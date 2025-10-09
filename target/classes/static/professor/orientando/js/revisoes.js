@@ -42,12 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .forEach(async revisao => {
           const alunoResp = await fetch(`/alunos/${revisao.emailAluno}`);
           if (!alunoResp.ok) throw new Error('Erro ao carregar aluno.');
-          const aluno = await alunoResp.json();
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${revisao.titulo}</td>
-            <td>${new Date(revisao.criadoEm).toLocaleDateString('pt-BR')}</td>
+            <td>${formatarData(revisao.criadoEm)}</td>
             <td>
               <a href="/revisoes/${revisao.id}/download" class="btn btn-sm btn-primary">Baixar</a>
             </td>
@@ -107,6 +106,16 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       reader.onerror = reject;
     });
+  }
+
+  function formatarData(isoString) {
+    const data = new Date(isoString);
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    const horas = String(data.getHours()).padStart(2, '0');
+    const minutos = String(data.getMinutes()).padStart(2, '0');
+    return `${dia}/${mes}/${ano}, ${horas}:${minutos}`;
   }
 
   carregarAlunos();

@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const mediaEl = document.getElementById('mediaFinal');
   const statusEl = document.getElementById('textStatus');
 
+
   const camposNotas = [
     { input: document.getElementById('nota1'), label: document.querySelector('label[for="nota1"]'), campo: 'nota1' },
     { input: document.getElementById('nota2'), label: document.querySelector('label[for="nota2"]'), campo: 'nota2' },
@@ -72,6 +73,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       orientadorEl.textContent = '—';
     }
+
+    const dataEHoraEl = document.getElementById('dataEHora');
+    dataEHoraEl.textContent = formatarDataEHora(banca.data, banca.hora);
 
     const professoresEmails = [
       banca.emailProfessor1,
@@ -176,4 +180,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       mostrarMensagem('Ocorreu um erro ao salvar a nota.', 'danger');
     }
   });
+
+  function formatarDataEHora(dataStr, horaStr) {
+    if (!dataStr) return '—';
+    const [ano, mes, dia] = dataStr.split('-');
+    let [h, m] = horaStr ? horaStr.split(':') : ['00','00'];
+    return `${dia.padStart(2,'0')}/${mes.padStart(2,'0')}/${ano}, ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
+  }
+
 });

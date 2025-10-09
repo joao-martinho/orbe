@@ -50,6 +50,8 @@ public class BancaServico {
             if (bancaModelo.getEmailProfessor1() != null) existente.setEmailProfessor1(bancaModelo.getEmailProfessor1());
             if (bancaModelo.getEmailProfessor2() != null) existente.setEmailProfessor2(bancaModelo.getEmailProfessor2());
             if (bancaModelo.getEmailProfessor3() != null) existente.setEmailProfessor3(bancaModelo.getEmailProfessor3());
+            if (bancaModelo.getData() != null) existente.setData(bancaModelo.getData());
+            if (bancaModelo.getHora() != null) existente.setHora(bancaModelo.getHora());
             if (bancaModelo.getNota1() != null) existente.setNota1(bancaModelo.getNota1());
             if (bancaModelo.getNota2() != null) existente.setNota2(bancaModelo.getNota2());
             if (bancaModelo.getNota3() != null) existente.setNota3(bancaModelo.getNota3());

@@ -82,12 +82,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const email = emailUsuario;
-    let finalizado = true;
+    let finalizado = false;
 
     if (email === termo.emailOrientador) {
-      finalizado = termo.statusOrientador?.toLowerCase() !== 'pendente';
+        finalizado = termo.statusOrientador?.toLowerCase() !== 'pendente';
     } else if (email === termo.emailCoorientador) {
-      finalizado = termo.statusCoorientador?.toLowerCase() !== 'pendente';
+        finalizado = termo.statusOrientador?.toLowerCase() !== 'aprovado' || termo.statusCoorientador?.toLowerCase() !== 'pendente';
     }
 
     if (btnAprovar) btnAprovar.disabled = finalizado;
@@ -171,8 +171,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (emailUsuario === termo.emailOrientador && termo.statusOrientador === 'pendente') {
       const payload = {
         statusOrientador: 'devolvido',
-        statusFinal: 'devolvido',
+        statusCoorientador: 'devolvido',
         statusProfessorTcc1: 'devolvido',
+        statusFinal: 'devolvido',
         comentario: comentario
       };
       await atualizarTermo(termo.id, payload);
@@ -181,7 +182,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (emailUsuario === termo.emailCoorientador && termo.statusOrientador === 'aprovado') {
-      await atualizarTermo(termo.id, { statusFinal: 'devolvido', statusProfessorTcc1: 'devolvido', comentario: comentario });
+      await atualizarTermo(termo.id, { 
+        statusFinal: 'devolvido', 
+        statusCoorientador: 'devolvido',
+        statusProfessorTcc1: 'devolvido',
+        statusFinal: 'devolvido', 
+        comentario: comentario });
       await refreshTermo();
     }
   }
