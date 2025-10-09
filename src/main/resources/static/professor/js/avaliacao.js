@@ -104,7 +104,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   } catch (err) {
     console.error(err);
-    mostrarMensagem('Ocorreu um erro ao carregar os dados.', 'danger');
   }
 
   function calcularMedia(bancaObj) {

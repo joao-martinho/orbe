@@ -2,7 +2,6 @@ package br.furb.orbe.banca;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 

@@ -116,9 +116,4 @@ document.addEventListener('DOMContentLoaded', () => {
         formPrimeiroAcesso.requestSubmit();
     });
 
-    [emailInput, senhaInput, confirmaInput, codigoVerInput].forEach(input =>
-        input.addEventListener('input', validarCampos)
-    );
-
-    validarCampos();
 });

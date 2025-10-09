@@ -131,7 +131,7 @@ public class TermoServico {
                 NotificacaoModelo notificacaoProf = new NotificacaoModelo();
                 notificacaoProf.setEmailDestinatario(email);
                 notificacaoProf.setTitulo("aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado" : "Termo devolvido");
-                notificacaoProf.setConteudo("O termo de compromisso do aluno " + termoExistente.getNomeAluno() + ("aprovado".equals(termoExistente.getStatusFinal()) ? "aprovado." : "devolvido."));
+                notificacaoProf.setConteudo("O termo de compromisso do aluno " + termoExistente.getNomeAluno() + (" foi aprovado".equals(termoExistente.getStatusFinal()) ? "aprovado." : "devolvido."));
                 notificacaoServico.cadastrarMensagem(notificacaoProf);
             }
         }
