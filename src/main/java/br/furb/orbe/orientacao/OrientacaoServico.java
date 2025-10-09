@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import br.furb.orbe.aluno.AlunoModelo;
 import br.furb.orbe.aluno.AlunoRepositorio;
-import br.furb.orbe.notificacao.NotificacaoModelo;
-import br.furb.orbe.notificacao.NotificacaoServico;
 import br.furb.orbe.professor.ProfessorModelo;
 import br.furb.orbe.professor.ProfessorRepositorio;
 import br.furb.orbe.termo.TermoModelo;
@@ -25,7 +23,6 @@ public class OrientacaoServico {
     private final ProfessorRepositorio professorRepositorio;
     private final AlunoRepositorio alunoRepositorio;
     private final TermoRepositorio termoRepositorio;
-    private final NotificacaoServico notificacaoServico;
 
     public ResponseEntity<AlunoModelo> removerRelacaoProvisoria(String emailAluno, String emailSolicitante) {
         if (emailAluno == null || emailSolicitante == null) {
@@ -85,51 +82,7 @@ public class OrientacaoServico {
             removerTermo(termoModelo.getId());
         }
 
-        enviarNotificacoesRemocao(aluno, orientador, coorientador, solicitanteEhAluno, solicitanteEhOrientador, solicitanteEhCoorientador);
-
         return new ResponseEntity<>(aluno, HttpStatus.OK);
-    }
-
-    private void enviarNotificacoesRemocao(AlunoModelo aluno, ProfessorModelo orientador, ProfessorModelo coorientador,
-                                           boolean alunoSolicitante, boolean orientadorSolicitante, boolean coorientadorSolicitante) {
-        if (alunoSolicitante || orientadorSolicitante) {
-            if (orientador != null) notificacaoServico.cadastrarMensagem(criarNotificacaoProfessor(aluno, orientador, "orientando"));
-            if (coorientador != null) notificacaoServico.cadastrarMensagem(criarNotificacaoProfessor(aluno, coorientador, "coorientando"));
-            notificacaoServico.cadastrarMensagem(criarNotificacaoAluno(aluno, orientador, coorientador));
-        } else if (coorientadorSolicitante) {
-            notificacaoServico.cadastrarMensagem(criarNotificacaoAluno(aluno, null, coorientador));
-            notificacaoServico.cadastrarMensagem(criarNotificacaoProfessor(aluno, coorientador, "coorientando"));
-        }
-    }
-
-    private NotificacaoModelo criarNotificacaoProfessor(AlunoModelo aluno, ProfessorModelo professor, String tipo) {
-        NotificacaoModelo n = new NotificacaoModelo();
-        n.setEmailDestinatario(professor.getEmail());
-        if ("orientando".equals(tipo)) {
-            n.setTitulo("Orientando removido");
-            n.setConteudo(aluno.getNome() + " não é mais seu orientando provisório. Deseje-lhe boa sorte. 😉");
-        } else if ("coorientando".equals(tipo)) {
-            n.setTitulo("Coorientando removido");
-            n.setConteudo(aluno.getNome() + " não é mais seu coorientando provisório. Deseje-lhe boa sorte. 😉");
-        }
-        return n;
-    }
-
-    private NotificacaoModelo criarNotificacaoAluno(AlunoModelo aluno, ProfessorModelo orientador, ProfessorModelo coorientador) {
-        NotificacaoModelo n = new NotificacaoModelo();
-        n.setEmailDestinatario(aluno.getEmail());
-        String conteudo = "";
-        if (orientador != null) {
-            n.setTitulo("Orientador removido");
-            conteudo += orientador.getNome() + " não é mais seu orientador provisório, mas lhe deseja boa sorte. 😉\n";
-        }
-        if (coorientador != null) {
-            n.setTitulo("Coorientador removido");
-            conteudo += coorientador.getNome() + " não é mais seu coorientador provisório, mas lhe deseja boa sorte. 😉";
-        }
-
-        n.setConteudo(conteudo);
-        return n;
     }
 
     public ResponseEntity<AlunoModelo> atribuirOrientadorProvisorio(String emailAluno, String emailProfessor) {
@@ -162,21 +115,6 @@ public class OrientacaoServico {
         else aluno.setCoorientadorProvisorio(emailProfessor);
 
         alunoRepositorio.save(aluno);
-
-        NotificacaoModelo notificacaoAluno = new NotificacaoModelo();
-        notificacaoAluno.setEmailDestinatario(aluno.getEmail());
-        notificacaoAluno.setTitulo(orientador ? "Orientador provisório escolhido" : "Coorientador provisório escolhido");
-        notificacaoAluno.setConteudo("Você escolheu " + professor.getNome() + " como seu " +
-                (orientador ? "orientador" : "coorientador") + " provisório. Agora é o momento de preencher o termo de compromisso.");
-        notificacaoServico.cadastrarMensagem(notificacaoAluno);
-
-        if (!orientador) {
-            NotificacaoModelo notificacaoProf = new NotificacaoModelo();
-            notificacaoProf.setEmailDestinatario(professor.getEmail());
-            notificacaoProf.setTitulo("Você é um coorientador provisório!");
-            notificacaoProf.setConteudo(aluno.getNome() + " escolheu você como coorientador provisório. Aguarde o recebimento do termo de compromisso.");
-            notificacaoServico.cadastrarMensagem(notificacaoProf);
-        }
 
         return new ResponseEntity<>(aluno, HttpStatus.OK);
     }

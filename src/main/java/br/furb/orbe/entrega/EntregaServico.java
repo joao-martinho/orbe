@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 import br.furb.orbe.aluno.AlunoModelo;
 import br.furb.orbe.aluno.AlunoRepositorio;
-import br.furb.orbe.notificacao.NotificacaoModelo;
-import br.furb.orbe.notificacao.NotificacaoServico;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,7 +17,6 @@ public class EntregaServico {
 
     private final EntregaRepositorio entregaRepositorio;
     private final AlunoRepositorio alunoRepositorio;
-    private final NotificacaoServico notificacaoServico;
     private final Path diretorio = Paths.get("uploads/entregas");
 
     public ResponseEntity<EntregaModelo> cadastrarAluno(String email, EntregaUploadDTO dto) throws IOException {
@@ -40,24 +37,6 @@ public class EntregaServico {
         entrega.setArquivoBase64(dto.getArquivoBase64());
 
         EntregaModelo salvo = entregaRepositorio.save(entrega);
-
-        NotificacaoModelo notificacaoOrientador = new NotificacaoModelo();
-        notificacaoOrientador.setEmailDestinatario(aluno.getOrientador());
-        notificacaoOrientador.setTitulo("Nova entrega recebida");
-        notificacaoOrientador.setConteudo(
-            aluno.getNome() + " enviou uma nova entrega: \"" + dto.getTitulo() + "\"."
-        );
-        notificacaoServico.cadastrarMensagem(notificacaoOrientador);
-
-        if (aluno.getCoorientador() != null) {
-            NotificacaoModelo notificacaoCoorientador = new NotificacaoModelo();
-            notificacaoCoorientador.setEmailDestinatario(aluno.getCoorientador());
-            notificacaoCoorientador.setTitulo("Nova entrega recebida");
-            notificacaoCoorientador.setConteudo(
-                aluno.getNome() + " enviou uma nova entrega: \"" + dto.getTitulo() + "\"."
-            );
-            notificacaoServico.cadastrarMensagem(notificacaoCoorientador);
-        }
 
         return ResponseEntity.status(201).body(salvo);
     }

@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import br.furb.orbe.banca.BancaServico;
-import br.furb.orbe.notificacao.NotificacaoModelo;
-import br.furb.orbe.notificacao.NotificacaoServico;
 import br.furb.orbe.orientacao.OrientacaoServico;
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +18,6 @@ public class TermoServico {
 
     private final OrientacaoServico orientacaoServico;  
     private final TermoRepositorio termoRepositorio;
-    private final NotificacaoServico notificacaoServico;
     private final BancaServico bancaServico;
 
     public ResponseEntity<Iterable<TermoModelo>> listarTermos() {
@@ -29,26 +26,6 @@ public class TermoServico {
 
     public ResponseEntity<TermoModelo> cadastrarTermo(TermoModelo termoModelo) {
         TermoModelo salvo = this.termoRepositorio.save(termoModelo);
-
-        NotificacaoModelo notificacaoAluno = new NotificacaoModelo();
-        notificacaoAluno.setEmailDestinatario(termoModelo.getEmailAluno());
-        notificacaoAluno.setTitulo("Termo de compromisso enviado");
-        notificacaoAluno.setConteudo("Você enviou o termo de compromisso. Aguarde a resposta do seu orientador.");
-        notificacaoServico.cadastrarMensagem(notificacaoAluno);
-
-        NotificacaoModelo notificacaoOrientador = new NotificacaoModelo();
-        notificacaoOrientador.setEmailDestinatario(termoModelo.getEmailOrientador());
-        notificacaoOrientador.setTitulo("Termo de compromisso recebido");
-        notificacaoOrientador.setConteudo(
-                termoModelo.getNomeAluno() + " enviou o termo de compromisso e aguarda a sua resposta."
-        );
-        notificacaoServico.cadastrarMensagem(notificacaoOrientador);
-
-        if (termoModelo.getEmailCoorientador() != null) {
-            notificacaoOrientador.setEmailDestinatario(termoModelo.getEmailCoorientador());
-            notificacaoServico.cadastrarMensagem(notificacaoOrientador);
-        }
-
         return new ResponseEntity<>(salvo, HttpStatus.CREATED);
     }
 
@@ -108,31 +85,12 @@ public class TermoServico {
                 bancaServico.criarAPartirDoTermo(salvo);
             }
 
-            String tituloAluno = "aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado 🎉" : "Termo devolvido 🙁";
-            String conteudoAluno = "aprovado".equals(termoExistente.getStatusFinal()) ?
-                    "O seu termo de compromisso foi aprovado." :
-                    "O seu termo de compromisso foi devolvido. Verifique a seção \"comentário\" na página do termo ou converse com o seu orientador.";
-
-            NotificacaoModelo notificacaoAluno = new NotificacaoModelo();
-            notificacaoAluno.setEmailDestinatario(termoExistente.getEmailAluno());
-            notificacaoAluno.setTitulo(tituloAluno);
-            notificacaoAluno.setConteudo(conteudoAluno);
-            notificacaoServico.cadastrarMensagem(notificacaoAluno);
-
             List<String> emailsProfessores = new ArrayList<>();
             if (termoExistente.getEmailOrientador() != null) {
                 emailsProfessores.add(termoExistente.getEmailOrientador());
             }
             if (termoExistente.getEmailCoorientador() != null) {
                 emailsProfessores.add(termoExistente.getEmailCoorientador());
-            }
-
-            for (String email : emailsProfessores) {
-                NotificacaoModelo notificacaoProf = new NotificacaoModelo();
-                notificacaoProf.setEmailDestinatario(email);
-                notificacaoProf.setTitulo("aprovado".equals(termoExistente.getStatusFinal()) ? "Termo aprovado" : "Termo devolvido");
-                notificacaoProf.setConteudo("O termo de compromisso do aluno " + termoExistente.getNomeAluno() + (" foi aprovado".equals(termoExistente.getStatusFinal()) ? "aprovado." : "devolvido."));
-                notificacaoServico.cadastrarMensagem(notificacaoProf);
             }
         }
 

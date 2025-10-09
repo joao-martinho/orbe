@@ -1,18 +1,11 @@
 package br.furb.orbe.banca;
 
-import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import br.furb.orbe.aluno.AlunoModelo;
-import br.furb.orbe.aluno.AlunoRepositorio;
-import br.furb.orbe.notificacao.NotificacaoModelo;
-import br.furb.orbe.notificacao.NotificacaoServico;
 import br.furb.orbe.termo.TermoModelo;
 import lombok.RequiredArgsConstructor;
 
@@ -21,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 public class BancaServico {
 
     private final BancaRepositorio bancaRepositorio;
-    private final NotificacaoServico notificacaoServico;
-    private final AlunoRepositorio alunoRepositorio;
 
     public ResponseEntity<Iterable<BancaModelo>> listarBancas() {
         return new ResponseEntity<>(bancaRepositorio.findAll(), HttpStatus.OK);
@@ -65,36 +56,7 @@ public class BancaServico {
             if (bancaModelo.getMediaFinal() != null) existente.setMediaFinal(bancaModelo.getMediaFinal());
             if (bancaModelo.getStatus() != null) existente.setStatus(bancaModelo.getStatus());
 
-            boolean dataMarcadaAgora = bancaModelo.getData() != null && !bancaModelo.getData().equals(existente.getData());
-            if (bancaModelo.getData() != null) existente.setData(bancaModelo.getData());
-            if (bancaModelo.getHora() != null) existente.setHora(bancaModelo.getHora());
-
-            existente.setMarcada(bancaModelo.isMarcada());
-
             BancaModelo salvo = bancaRepositorio.save(existente);
-
-            if (dataMarcadaAgora && salvo.isMarcada()) {
-                Set<String> emails = new HashSet<>();
-                emails.add(salvo.getEmailAluno());
-                emails.add(salvo.getEmailOrientador());
-                if (salvo.getEmailCoorientador() != null) emails.add(salvo.getEmailCoorientador());
-                if (salvo.getEmailProfessor1() != null) emails.add(salvo.getEmailProfessor1());
-                if (salvo.getEmailProfessor2() != null) emails.add(salvo.getEmailProfessor2());
-                if (salvo.getEmailProfessor3() != null) emails.add(salvo.getEmailProfessor3());
-
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                AlunoModelo alunoModelo = alunoRepositorio.findByEmail(bancaModelo.getEmailAluno());
-
-                for (String email : emails) {
-                    NotificacaoModelo notificacao = new NotificacaoModelo();
-                    notificacao.setEmailDestinatario(email);
-                    notificacao.setTitulo("Apresentação marcada");
-                    notificacao.setConteudo("A apresentação do trabalho \"" + salvo.getTitulo() +
-                        "\", do aluno " + alunoModelo.getNome() + ", foi marcada para " + 
-                        salvo.getData().format(formatter) + " às " + salvo.getHora() + ".");
-                    notificacaoServico.cadastrarMensagem(notificacao);
-                }
-            }
 
             return new ResponseEntity<>(salvo, HttpStatus.OK);
         }

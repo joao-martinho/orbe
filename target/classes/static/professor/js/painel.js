@@ -224,29 +224,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  const badgeMensagens = document.getElementById('badge-mensagens')
-
-  async function atualizarBadgeMensagens() {
-    try {
-      const res = await fetch(`/notificacoes/${encodeURIComponent(email)}`);
-      if (!res.ok) throw new Error(`Falha ao carregar notificações. Status: ${res.status}`);
-
-      const dados = await res.json();
-      const mensagens = Array.isArray(dados) ? dados : [dados];
-      const naoLidas = mensagens.filter(msg => !msg.lida).length;
-
-      if (naoLidas > 0) {
-        badgeMensagens.textContent = naoLidas;
-        badgeMensagens.style.display = 'inline-block';
-      } else {
-        badgeMensagens.style.display = 'none';
-      }
-    } catch (err) {
-      console.error('Erro ao buscar mensagens:', err);
-      badgeMensagens.style.display = 'none';
-    }
-  }
-
   async function carregarBancas(email, row) {
     try {
       const response = await fetch('/bancas');
@@ -312,6 +289,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   await carregarBancas(email, row);
-  await atualizarBadgeMensagens();
 
 });

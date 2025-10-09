@@ -8,10 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
-import br.furb.orbe.notificacao.NotificacaoModelo;
-import br.furb.orbe.notificacao.NotificacaoServico;
-import br.furb.orbe.professor.ProfessorModelo;
-import br.furb.orbe.professor.ProfessorRepositorio;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -19,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class RevisaoServico {
 
     private final RevisaoRepositorio revisaoRepositorio;
-    private final NotificacaoServico notificacaoServico;
-    private final ProfessorRepositorio professorRepositorio;
     private final Path diretorio = Paths.get("uploads/revisoes");
 
     public ResponseEntity<RevisaoModelo> cadastrar(String email, RevisaoUploadDTO dto) throws IOException {
@@ -38,15 +32,6 @@ public class RevisaoServico {
         revisao.setArquivoBase64(dto.getArquivoBase64());
 
         RevisaoModelo salvo = revisaoRepositorio.save(revisao);
-        ProfessorModelo professorModelo = professorRepositorio.findByEmail(email);
-
-        NotificacaoModelo notificacaoAluno = new NotificacaoModelo();
-        notificacaoAluno.setEmailDestinatario(dto.getEmailAluno());
-        notificacaoAluno.setTitulo("Nova revisão recebida");
-        notificacaoAluno.setConteudo(
-            professorModelo.getNome() + " enviou uma nova revisão: \"" + dto.getTitulo() + "\"."
-        );
-        notificacaoServico.cadastrarMensagem(notificacaoAluno);
 
         return ResponseEntity.status(201).body(salvo);
     }
