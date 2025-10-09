@@ -133,15 +133,6 @@ classDiagram
         -boolean profTcc1
     }
 
-    class NotificacaoModelo {
-        -Long id
-        -String titulo
-        -String emailRemetente
-        -String emailDestinatario
-        -String conteudo
-        -boolean lida
-    }
-
     %% Relacionamentos (via e-mails)
     AlunoModelo --> ProfessorModelo : orientadorProvisorio
     AlunoModelo --> ProfessorModelo : orientador
@@ -160,8 +151,5 @@ classDiagram
     RevisaoModelo --> AlunoModelo : emailAluno
     DocumentoModelo --> ProfessorModelo : emailAutor
     DocumentoModelo --> AlunoModelo : emailAluno
-    NotificacaoModelo --> AlunoModelo : destinatário
-    NotificacaoModelo --> AlunoModelo : remetente
-    NotificacaoModelo --> ProfessorModelo : destinatário
 
 ```

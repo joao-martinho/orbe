@@ -212,56 +212,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('confirmRemove').addEventListener('click', async () => {
     modalConfirm.hide();
+    mensagem.innerHTML = '';
 
     try {
       const urlOri = `/alunos/remover-provisorio/${encodeURIComponent(alunoEmail)}/${encodeURIComponent(orientadorEmail)}`;
-      const resOri = await fetch(urlOri, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!resOri.ok) {
-        const text = await resOri.text();
-        const erroData = text ? JSON.parse(text) : {};
-        throw new Error(erroData.message || 'Erro ao remover orientador.');
+      const resOri = await fetch(urlOri, { method: 'PATCH' });
+
+      if (!resOri.ok && resOri.status !== 403) {
+        throw new Error('Erro ao remover orientador.');
       }
 
       if (coorientadorEmail) {
         const urlCoor = `/alunos/remover-provisorio/${encodeURIComponent(alunoEmail)}/${encodeURIComponent(coorientadorEmail)}`;
-        const resCoor = await fetch(urlCoor, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' }
-        });
-        if (!resCoor.ok) {
-          const text = await resCoor.text();
-          const erroData = text ? JSON.parse(text) : {};
-          throw new Error(erroData.message || 'Erro ao remover coorientador.');
+        const resCoor = await fetch(urlCoor, { method: 'PATCH' });
+
+        if (!resCoor.ok && resCoor.status !== 403) {
+          throw new Error('Erro ao remover coorientador.');
         }
       }
 
-      mensagem.innerHTML = '<div class="alert alert-success">Orientador removido com sucesso.</div>';
+      mensagem.innerHTML = '<div class="alert alert-success">Orientadores removidos com sucesso.</div>';
       visualizacao.style.display = 'none';
-      selectOrientador.disabled = false;
-      form.querySelector('button[type="submit"]').disabled = false;
-      selectOrientador.value = "";
+
       orientadorEmail = null;
       coorientadorEmail = null;
-      checkCoorientador.disabled = false;
-      checkCoorientador.checked = false;
+
+      selectOrientador.disabled = false;
+      selectOrientador.value = "";
       selectCoorientador.disabled = false;
       selectCoorientador.value = "";
+      checkCoorientador.disabled = false;
+      checkCoorientador.checked = false;
 
       coorientadorContainer.style.maxHeight = '0';
       coorientadorContainer.style.opacity = '0';
       setTimeout(() => {
-        if (!checkCoorientador.checked) {
-          coorientadorContainer.style.display = 'none';
-        }
+        if (!checkCoorientador.checked) coorientadorContainer.style.display = 'none';
       }, 500);
 
       viewCoorientadorWrapper.style.display = 'none';
+      form.querySelector('button[type="submit"]').disabled = false;
 
     } catch (err) {
       mensagem.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
     }
   });
+
 });

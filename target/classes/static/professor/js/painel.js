@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (tipo !== 'professor') {
     alert('Você não tem permissão para acessar esta página :(');
     window.location.href = '../login.html';
+    return;
   }
 
   const btnSair = document.getElementById('btnSair');
@@ -17,10 +18,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const row = document.querySelector('.row');
+  const secaoFuncoes = document.getElementById('secao-funcoes-professor');
+  const secaoAlunos = document.getElementById('secao-alunos');
+  const secaoBancas = document.getElementById('secao-bancas');
 
-  if (!row) {
-    console.error('Container .row não encontrado!');
+  if (!secaoFuncoes || !secaoAlunos || !secaoBancas) {
+    console.error('Uma ou mais seções esperadas não foram encontradas!');
     return;
   }
 
@@ -28,26 +31,52 @@ document.addEventListener('DOMContentLoaded', async () => {
   let alunoSelecionado = null;
   let colSelecionado = null;
 
-  document.querySelectorAll('.col.revisao').forEach(col => {
-    const role = col.dataset.role;
-    if (localStorage.getItem(role) === 'true') {
-      col.style.display = 'block';
-    }
-  });
+  function criarCardPlaceholder(secao, tipo) {
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.style.display = 'block';
 
-  document.querySelectorAll('.col[data-role]').forEach(col => {
+    const card = document.createElement('div');
+    card.className = 'card h-100 shadow-sm text-muted';
+
+    const body = document.createElement('div');
+    body.className = 'card-body d-flex flex-column justify-content-between';
+
+    const title = document.createElement('h5');
+    title.className = 'card-title';
+    title.textContent = tipo === 'aluno' ? 'Nenhum orientando' :
+                        tipo === 'banca' ? 'Nenhuma banca' :
+                        'Nenhuma função';
+
+    const text = document.createElement('p');
+    text.className = 'card-text';
+    text.textContent = tipo === 'aluno' ? 'Você ainda não tem nenhum orientando.' :
+                        tipo === 'banca' ? 'Você não faz parte de nenhuma banca de avaliação.' :
+                        'Não há nenhum papel especial atribuído a você.';
+
+    const button = document.createElement('button');
+    button.className = 'btn btn-secondary mt-3';
+    button.textContent = 'Indisponível';
+    button.disabled = true;
+
+    body.appendChild(title);
+    body.appendChild(text);
+    body.appendChild(button);
+
+    card.appendChild(body);
+    col.appendChild(card);
+    secao.appendChild(col);
+  }
+
+  secaoFuncoes.querySelectorAll('.col[data-role]').forEach(col => {
     const role = col.dataset.role;
     if (localStorage.getItem(role) === 'true') {
       col.style.display = 'block';
     } else {
       col.style.display = 'none';
     }
-  });
 
-  document.querySelectorAll('.col[data-role]').forEach(col => {
-    const role = col.dataset.role;
     let label = null;
-
     if (role === 'prof_tcc1') label = 'Professor de TCC I';
     if (role === 'prof_tcc2') label = 'Professor de TCC II';
     if (role === 'coord_bcc') label = 'Coordenador de BCC';
@@ -56,21 +85,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (label) {
       const card = col.querySelector('.card');
       if (!card) return;
-
       const badgeContainer = document.createElement('div');
       badgeContainer.className = 'position-absolute top-0 end-0 m-2';
-
       const badge = document.createElement('span');
       badge.className = 'badge bg-success';
       badge.textContent = label;
-
       badgeContainer.appendChild(badge);
       card.classList.add('position-relative');
       card.appendChild(badgeContainer);
     }
   });
 
-  function criarCard(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
+  if (!secaoFuncoes.querySelector('.col') || Array.from(secaoFuncoes.querySelectorAll('.col')).every(col => col.style.display === 'none')) {
+    criarCardPlaceholder(secaoFuncoes, 'funcoes');
+  }
+
+  function criarCardAluno(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
     if (emailsProcessados.has(aluno.email)) return;
     emailsProcessados.add(aluno.email);
 
@@ -98,16 +128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       badgeContainer.appendChild(badgeCoorientando);
     }
 
-    if (badgeContainer.childElementCount > 0) {
-      card.appendChild(badgeContainer);
-    }
+    if (badgeContainer.childElementCount > 0) card.appendChild(badgeContainer);
 
     const body = document.createElement('div');
     body.className = 'card-body d-flex flex-column justify-content-between';
 
     const title = document.createElement('h5');
     title.className = 'card-title';
-    title.textContent = 'Orientando';
+    title.textContent = aluno.nome.trim().split(/\s+/)[0];
 
     const text = document.createElement('p');
     text.className = 'card-text text-muted';
@@ -133,24 +161,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     link.href = 'orientando/painel.html';
     link.className = 'btn btn-primary flex-fill';
     link.textContent = 'Acessar';
-
     buttonContainer.appendChild(link);
 
     body.appendChild(title);
     body.appendChild(text);
     body.appendChild(buttonContainer);
-
     card.appendChild(body);
     col.appendChild(card);
-    row.appendChild(col);
+    secaoAlunos.appendChild(col);
 
     card.addEventListener('click', () => {
       localStorage.setItem('orientando', aluno.email);
-    });
-
-    card.addEventListener('click', () => {
-      localStorage.setItem('orientando', aluno.email);
-
       if (tipoOrientacao.includes('Coorientando')) {
         localStorage.setItem('isCoorientando', 'true');
       } else {
@@ -171,10 +192,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch(t.url);
       if (!response.ok) throw new Error(`Erro ao buscar ${t.tipo}${t.provisorio ? ' provisórios' : ''}: ${response.status}`);
       const alunos = await response.json();
-      alunos.forEach(aluno => criarCard(aluno, t.tipo, t.provisorio));
+      alunos.forEach(aluno => criarCardAluno(aluno, t.tipo, t.provisorio));
     }
+
+    if (!secaoAlunos.querySelector('.col')) criarCardPlaceholder(secaoAlunos, 'aluno');
   } catch (err) {
     console.error(err);
+    criarCardPlaceholder(secaoAlunos, 'aluno');
   }
 
   const modalHTML = `
@@ -214,17 +238,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const erroData = text ? JSON.parse(text) : {};
         throw new Error(erroData.message || 'Erro ao remover aluno.');
       }
-
       colSelecionado.remove();
       alunoSelecionado = null;
       colSelecionado = null;
-
+      if (!secaoAlunos.querySelector('.col')) criarCardPlaceholder(secaoAlunos, 'aluno');
     } catch (err) {
       console.error(err);
     }
   });
 
-  async function carregarBancas(email, row) {
+  async function carregarBancas(email) {
     try {
       const response = await fetch('/bancas');
       if (!response.ok) throw new Error('Erro ao carregar bancas');
@@ -268,7 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const link = document.createElement('a');
         link.href = './avaliacao.html';
-        link.className = 'btn btn-primary mt-3';
+        link.className = 'btn btn-warning mt-3';
         link.textContent = 'Acessar';
         link.addEventListener('click', () => {
           localStorage.setItem('avaliando', banca.emailAluno);
@@ -280,14 +303,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         card.appendChild(body);
         col.appendChild(card);
-        row.appendChild(col);
+        secaoBancas.appendChild(col);
       }
+
+      if (!secaoBancas.querySelector('.col')) criarCardPlaceholder(secaoBancas, 'banca');
 
     } catch (err) {
       console.error('Erro ao carregar bancas:', err);
+      criarCardPlaceholder(secaoBancas, 'banca');
     }
   }
 
-  await carregarBancas(email, row);
-
+  await carregarBancas(email);
 });
