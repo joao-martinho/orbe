@@ -76,7 +76,7 @@ classDiagram
         -String semestre
         -String resumo
         -LocalDateTime criadoEm
-        -String situacao
+        -String status
         -String comentario
     }
 
@@ -98,7 +98,7 @@ classDiagram
         -Float nota2
         -Float nota3
         -Float mediaFinal
-        -String situacao
+        -String status
     }
 
     class EntregaModelo {
