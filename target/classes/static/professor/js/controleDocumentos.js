@@ -40,14 +40,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const entregasFiltradas = entregasTotais.filter(entrega => entrega.profTcc1 === false);
 
+      tabelaBody.innerHTML = '';
+
       if (!entregasFiltradas.length) {
-        tabelaBody.innerHTML = '';
+        const placeholder = tabelaBody.insertRow();
+        placeholder.innerHTML = `
+          <td colspan="4" style="text-align:center; color:gray;">Você ainda não recebeu nenhum projeto.</td>
+        `;
         return;
       }
 
       entregasFiltradas.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
 
-      tabelaBody.innerHTML = '';
       for (const entrega of entregasFiltradas) {
         const dataFormatada = formatDataHoraBR(new Date(entrega.criadoEm));
         const nomeAluno = await buscarNomeAluno(entrega.emailAluno);
@@ -67,6 +71,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
       console.error(error);
       tabelaBody.innerHTML = '';
+      const placeholder = tabelaBody.insertRow();
+      placeholder.innerHTML = `
+        <td colspan="4" style="text-align:center; color:gray;">Você ainda não recebeu nenhum projeto.</td>
+      `;
     }
   }
 

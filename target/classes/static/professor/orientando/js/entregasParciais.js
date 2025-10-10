@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const tipo = localStorage.getItem('tipo');
-	if (tipo !== 'professor') {
+	if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
 		alert('Você não tem permissão para acessar esta página :(');
 		window.location.href = '../../login.html';
 	}
@@ -23,17 +23,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (!email) return;
 
 		try {
-			const emailAluno = localStorage.getItem('orientando')
+			const emailAluno = localStorage.getItem('orientando');
 			const response = await fetch(`/entregas/aluno/${encodeURIComponent(emailAluno)}`);
 			if (!response.ok) throw new Error('Erro ao buscar entregas.');
 			const data = await response.json();
 
 			tabela.innerHTML = '';
 
+			if (data.length === 0) {
+				const placeholder = tabela.insertRow();
+				placeholder.innerHTML = `
+					<td colspan="3" style="text-align:center; color:gray;">Você ainda não recebeu nenhuma entrega parcial.</td>
+				`;
+				return;
+			}
+
 			data
 				.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
-				.forEach(async entrega => {
-
+				.forEach(entrega => {
 					const fileira = tabela.insertRow();
 					fileira.innerHTML = `
 						<td>${entrega.titulo}</td>

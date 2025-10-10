@@ -37,6 +37,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       listaTermos.innerHTML = '';
 
+      if (!termos.length) {
+        const placeholder = document.createElement('tr');
+        placeholder.innerHTML = `
+          <td colspan="6" style="text-align:center; color:gray;">Você ainda não recebeu nenhum termo de compromisso.</td>
+        `;
+        listaTermos.appendChild(placeholder);
+        return;
+      }
+
       termos.forEach(termo => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -66,6 +75,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (err) {
       console.error(err);
+      const placeholder = document.createElement('tr');
+      placeholder.innerHTML = `
+        <td colspan="6" style="text-align:center; color:gray;">Você ainda não recebeu nenhum termo de compromisso.</td>
+      `;
+      listaTermos.appendChild(placeholder);
     }
   }
 
@@ -113,8 +127,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnAprovar.onclick = () => atualizarStatus(termo, 'aprovado');
     btnDevolver.onclick = () => atualizarStatus(termo, 'devolvido');
   }
-
-
 
   async function buscarNomeProfessor(email) {
     if (!email) return '—';

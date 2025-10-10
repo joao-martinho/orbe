@@ -1,15 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-	if (tipo !== 'professor') {
-		alert('Você não tem permissão para acessar esta página :(');
-		window.location.href = '../login.html';
-	}
+  if (tipo !== 'professor') {
+    alert('Você não tem permissão para acessar esta página :(');
+    window.location.href = '../login.html';
+  }
 
-	const btnSair = document.getElementById('btnSair');
-	btnSair.addEventListener('click', () => {
-		localStorage.clear();
-		window.location.href = '../login.html';
-	});
+  const btnSair = document.getElementById('btnSair');
+  btnSair.addEventListener('click', () => {
+    localStorage.clear();
+    window.location.href = '../login.html';
+  });
 
   const listaTermos = document.getElementById('listaTermos');
   const modal = new bootstrap.Modal(document.getElementById('modalApresentacao'));
@@ -78,31 +78,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         termosFiltrados = termos.filter(t => t.curso === 'SIS');
     }
 
-    termosFiltrados
-    .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
-    .forEach(async termo => {
-      const tr = document.createElement('tr');
-
-      tr.innerHTML = `
-          <td>${termo.nomeAluno}</td>
-          <td>${termo.titulo}</td>
-          <td>${termo.nomeOrientador}</td>
-          <td>${termo.nomeCoorientador}</td>
-          <td>${criarBadgeStatus(termo.marcada)}</td>
-          <td>
-              <button class="btn btn-sm btn-primary btn-configurar">Ver</button>
-          </td>
+    if (!termosFiltrados.length) {
+      const placeholder = document.createElement('tr');
+      placeholder.innerHTML = `
+        <td colspan="6" style="text-align:center; color:gray;">Você ainda não tem nenhuma banca registrada.</td>
       `;
+      listaTermos.appendChild(placeholder);
+      return;
+    }
 
-      tr.querySelector('.btn-configurar').addEventListener('click', () => abrirModal(termo));
-      listaTermos.prepend(tr); // insere no topo
-  });
+    termosFiltrados
+      .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
+      .forEach(async termo => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${termo.nomeAluno}</td>
+            <td>${termo.titulo}</td>
+            <td>${termo.nomeOrientador}</td>
+            <td>${termo.nomeCoorientador}</td>
+            <td>${criarBadgeStatus(termo.marcada)}</td>
+            <td>
+                <button class="btn btn-sm btn-primary btn-configurar">Ver</button>
+            </td>
+        `;
+        tr.querySelector('.btn-configurar').addEventListener('click', () => abrirModal(termo));
+        listaTermos.prepend(tr);
+    });
   }
 
   function criarBadgeStatus(status) {
     switch (status) {
-        case false: return '<span class="badge bg-warning text-dark">Não marcada</span>'
-        case true: return '<span class="badge bg-success">Marcada</span>'
+        case false: return '<span class="badge bg-warning text-dark">Não marcada</span>';
+        case true: return '<span class="badge bg-success">Marcada</span>';
     }
   }
 
@@ -128,7 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('modalResumo').textContent = termo.resumo;
 
     const professores = await carregarTodosProfessores();
-
     const nomeOrientador = termo.nomeOrientador || await getNomeProfessor(termo.emailOrientador);
     const nomeCoorientador = termo.nomeCoorientador || (termo.emailCoorientador ? await getNomeProfessor(termo.emailCoorientador) : '—');
 
@@ -138,7 +144,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     ['professor1', 'professor2', 'professor3'].forEach((id, i) => {
       const select = document.getElementById(id);
       select.innerHTML = '<option value="">Selecione</option>';
-
       professores.forEach(prof => {
         const option = document.createElement('option');
         option.value = prof.email;
@@ -152,7 +157,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('horaApresentacao').value = termo.hora || '';
 
     const btnSalvar = document.getElementById('btnSalvar');
-
     if (termo.marcada) {
         btnSalvar.disabled = true;
         btnSalvar.style.opacity = '0.5';

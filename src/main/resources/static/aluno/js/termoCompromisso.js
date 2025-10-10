@@ -1,15 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'aluno') {
-    alert('Você não tem permissão para acessar esta página :(');
-    window.location.href = '../login.html';
-  }
+  verificarAcesso();
 
-  const btnSair = document.getElementById('btnSair');
-  btnSair.addEventListener('click', () => {
-    localStorage.clear();
-    window.location.href = '../login.html';
-  });
+  async function verificarAcesso() {
+    const tipo = localStorage.getItem('tipo');
+    const emailAluno = localStorage.getItem('email');
+
+    if (tipo !== 'aluno' || !emailAluno) {
+      alert('Você não tem permissão para acessar esta página.');
+      window.location.href = '../login.html';
+      return;
+    }
+
+    const res = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
+    if (!res.ok) {
+      alert('Erro ao carregar dados do aluno.');
+      window.location.href = '../login.html';
+      return;
+    }
+
+    const aluno = await res.json();
+
+    if (!aluno.orientador) {
+      alert('Você não tem permissão para acessar esta página.');
+      window.location.href = '../login.html';
+      return;
+    }
+
+  }
 
   const btnFinalizar = document.querySelector('button[type="submit"]');
   const visualizacaoTermo = document.getElementById('visualizacaoTermo');

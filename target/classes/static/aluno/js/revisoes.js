@@ -1,15 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
-	const tipo = localStorage.getItem('tipo');
-	if (tipo !== 'aluno') {
-		alert('Você não tem permissão para acessar esta página :(');
-		window.location.href = '../login.html';
-	}
+	verificarAcesso();
 
-	const btnSair = document.getElementById('btnSair');
-	btnSair.addEventListener('click', () => {
-		localStorage.clear();
-		window.location.href = '../login.html';
-	});
+	async function verificarAcesso() {
+		const tipo = localStorage.getItem('tipo');
+		const emailAluno = localStorage.getItem('email');
+
+		if (tipo !== 'aluno' || !emailAluno) {
+			alert('Você não tem permissão para acessar esta página.');
+			window.location.href = '../login.html';
+			return;
+		}
+
+		const res = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
+		if (!res.ok) {
+			alert('Erro ao carregar dados do aluno.');
+			window.location.href = '../login.html';
+			return;
+		}
+
+		const aluno = await res.json();
+
+		if (!aluno.orientador) {
+			alert('Você não tem permissão para acessar esta página.');
+			window.location.href = '../login.html';
+			return;
+		}
+	}
 
 	const tabela = document.getElementById('tabelaEntregas').getElementsByTagName('tbody')[0];
 	const email = localStorage.getItem('email');
@@ -33,6 +49,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			const data = await resp.json();
 
 			tabela.innerHTML = '';
+
+			if (!data.length) {
+				const placeholder = tabela.insertRow();
+				placeholder.innerHTML = `
+					<td colspan="4" style="text-align:center; color:gray;">Você ainda não recebeu nenhuma revisão.</td>
+				`;
+				return;
+			}
 
 			data.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
 
@@ -59,6 +83,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		} catch (erro) {
 			console.error('Erro ao carregar revisões: ', erro);
+			tabela.innerHTML = '';
+			const placeholder = tabela.insertRow();
+			placeholder.innerHTML = `
+				<td colspan="4" style="text-align:center; color:gray;">Você ainda não tem nenhuma revisão.</td>
+			`;
 		}
 	}
 

@@ -40,11 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!response.ok) throw new Error('Erro ao carregar documentos');
       const documentos = await response.json();
 
-      tabelaBody.innerHTML = '';
-
       const documentosFiltrados = documentos
         .filter(doc => doc.profTcc1 === true)
         .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
+
+      tabelaBody.innerHTML = '';
+
+      if (!documentosFiltrados.length) {
+        const placeholder = tabelaBody.insertRow();
+        placeholder.innerHTML = `
+          <td colspan="4" style="text-align:center; color:gray;">Você ainda não enviou nenhuma revisão.</td>
+        `;
+        return;
+      }
 
       for (const doc of documentosFiltrados) {
         const tr = document.createElement('tr');
@@ -71,6 +79,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (error) {
       console.error(error);
+      tabelaBody.innerHTML = '';
+      const placeholder = tabelaBody.insertRow();
+      placeholder.innerHTML = `
+        <td colspan="4" style="text-align:center; color:gray;">Você ainda não enviou nenhuma revisão.</td>
+      `;
     }
   }
 

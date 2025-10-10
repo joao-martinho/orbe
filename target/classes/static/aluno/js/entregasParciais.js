@@ -1,8 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
-	const tipo = localStorage.getItem('tipo');
-	if (tipo !== 'aluno') {
-		alert('Você não tem permissão para acessar esta página :(');
-		window.location.href = '../login.html';
+	verificarAcesso();
+
+	async function verificarAcesso() {
+		const tipo = localStorage.getItem('tipo');
+		const emailAluno = localStorage.getItem('email');
+
+		if (tipo !== 'aluno' || !emailAluno) {
+			alert('Você não tem permissão para acessar esta página.');
+			window.location.href = '../login.html';
+			return;
+		}
+
+		const res = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
+		if (!res.ok) {
+			alert('Erro ao carregar dados do aluno.');
+			window.location.href = '../login.html';
+			return;
+		}
+
+		const aluno = await res.json();
+
+		if (!aluno.orientador) {
+			alert('Você não tem permissão para acessar esta página.');
+			window.location.href = '../login.html';
+			return;
+		}
 	}
 
 	const btnSair = document.getElementById('btnSair');
@@ -36,6 +58,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			.then(data => {
 				tabela.innerHTML = '';
 
+				if (!data.length) {
+					const placeholder = tabela.insertRow();
+					placeholder.innerHTML = `
+						<td colspan="3" style="text-align:center; color:gray;">Você ainda não enviou nenhuma entrega parcial.</td>
+					`;
+					return;
+				}
+
 				data
 					.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
 					.forEach(entrega => {
@@ -47,7 +77,14 @@ document.addEventListener('DOMContentLoaded', function () {
 						`;
 					});
 			})
-			.catch(erro => console.error('Erro ao carregar entregas: ', erro));
+			.catch(erro => {
+				console.error('Erro ao carregar entregas: ', erro);
+				tabela.innerHTML = '';
+				const placeholder = tabela.insertRow();
+				placeholder.innerHTML = `
+					<td colspan="3" style="text-align:center; color:gray;">Você ainda não enviou nenhuma entrega parcial.</td>
+				`;
+			});
 	}
 
 	carregarEntregas();

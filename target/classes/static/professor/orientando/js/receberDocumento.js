@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  const tipo = localStorage.getItem('tipo');
+  if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
+    alert('Você não tem permissão para acessar esta página :(');
+    window.location.href = '../../login.html';
+  }
+
   const btnSair = document.getElementById('btnSair');
   const tabelaBody = document.querySelector('#tabelaEntregas tbody');
 
@@ -8,25 +14,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   const email = localStorage.getItem('orientando');
-  if (!email) {
-    return;
-  }
+  if (!email) return;
 
   try {
     const res = await fetch(`/documentos/aluno/${email}`);
     if (!res.ok) throw new Error('Erro ao buscar documentos');
 
     let documentos = await res.json();
-
     const documentosFiltrados = documentos.filter(doc => doc.profTcc1 === true);
 
+    tabelaBody.innerHTML = '';
+
     if (!documentosFiltrados.length) {
+      const placeholder = document.createElement('tr');
+      placeholder.innerHTML = `
+        <td colspan="3" style="text-align:center; color:gray;">Você ainda não recebeu nenhum documento.</td>
+      `;
+      tabelaBody.appendChild(placeholder);
       return;
     }
 
     documentosFiltrados.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
 
-    tabelaBody.innerHTML = '';
     documentosFiltrados.forEach(doc => {
       const tr = document.createElement('tr');
 

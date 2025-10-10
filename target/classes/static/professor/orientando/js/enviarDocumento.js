@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'professor') {
+  if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
     alert('Você não tem permissão para acessar esta página :(');
     window.location.href = '../../login.html';
   }
@@ -37,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const entregasFiltradas = data.filter(entrega => entrega.profTcc1 === false);
 
         if (!entregasFiltradas.length) {
+          const placeholder = tabela.insertRow();
+          placeholder.innerHTML = `
+            <td colspan="3" style="text-align:center; color:gray;">Você ainda não enviou nenhum documento.</td>
+          `;
           return;
         }
 

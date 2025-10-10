@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'professor') {
+  if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
     alert('Você não tem permissão para acessar esta página :(');
     window.location.href = '../../login.html';
     return;
@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const resp = await fetch('/alunos');
       if (!resp.ok) throw new Error('Erro ao carregar alunos.');
-
     } catch (e) {
       mensagem.textContent = e.message;
       mensagem.classList.add('text-danger');
@@ -30,12 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function carregarEntregas() {
     try {
-      const emailAluno = localStorage.getItem('orientando')
+      const emailAluno = localStorage.getItem('orientando');
       const resp = await fetch(`/revisoes/aluno/${emailAluno}`);
       if (!resp.ok) throw new Error('Erro ao carregar revisões.');
       const revisoes = await resp.json();
 
       tabelaBody.innerHTML = '';
+
+      if (!revisoes.length) {
+        const placeholder = tabelaBody.insertRow();
+        placeholder.innerHTML = `
+          <td colspan="3" style="text-align:center; color:gray;">Você ainda não enviou nenhuma revisão.</td>
+        `;
+        return;
+      }
 
       revisoes
         .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
@@ -64,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mensagem.textContent = '';
 
     try {
-      const emailAluno = localStorage.getItem('orientando')
+      const emailAluno = localStorage.getItem('orientando');
       const titulo = document.getElementById('titulo').value;
       const arquivo = document.getElementById('arquivo').files[0];
 

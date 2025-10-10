@@ -1,10 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'aluno') {
-    alert('Você não tem permissão para acessar esta página :(');
-    window.location.href = '../login.html';
-    return;
-  }
+	const emailAluno = localStorage.getItem('email');
+	const resAluno = fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
+
+	if (tipo !== 'aluno' || !localStorage.getItem('email')) {
+		alert('Você não tem permissão para acessar esta página.');
+		window.location.href = '../login.html';
+	}
+	else if (resAluno.orientador) {
+		alert('Você não tem permissão para acessar esta página.');
+		window.location.href = '../login.html';
+	}
 
   const btnSair = document.getElementById('btnSair');
   btnSair?.addEventListener('click', () => {
