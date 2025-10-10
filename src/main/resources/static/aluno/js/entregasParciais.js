@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+	const btnSair = document.getElementById('btnSair');
+    btnSair?.addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = '../login.html';
+    });
+	
 	verificarAcesso();
 
 	async function verificarAcesso() {
@@ -26,12 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			return;
 		}
 	}
-
-	const btnSair = document.getElementById('btnSair');
-	btnSair.addEventListener('click', () => {
-		localStorage.clear();
-		window.location.href = '../login.html';
-	});
 
 	const tabela = document.getElementById('tabelaEntregas').getElementsByTagName('tbody')[0];
 	const formularioEntrega = document.getElementById('formularioEntrega');

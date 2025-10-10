@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const btnSair = document.getElementById('btnSair');
+  btnSair?.addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = '../login.html';
+  });
+  
   verificarAcesso();
 
   async function verificarAcesso() {
@@ -20,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const aluno = await res.json();
 
-    if (!aluno.orientador) {
+    if (!aluno.orientadorProvisorio) {
       alert('Você não tem permissão para acessar esta página.');
       window.location.href = '../login.html';
       return;
