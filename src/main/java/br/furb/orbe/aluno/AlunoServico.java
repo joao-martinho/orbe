@@ -46,38 +46,19 @@ public class AlunoServico {
         if (optional.isPresent()) {
             AlunoModelo existente = optional.get();
 
-            if (alunoModelo.getNome() != null) {
-                existente.setNome(alunoModelo.getNome());
-            }
-            if (alunoModelo.getTelefone() != null) {
-                existente.setTelefone(alunoModelo.getTelefone());
-            }
-            if (alunoModelo.getOrientador() != null) {
-                existente.setOrientador(alunoModelo.getOrientador());
-            }
-            if (alunoModelo.getCoorientador() != null) {
-                existente.setCoorientador(alunoModelo.getCoorientador());
-            }
-            if (alunoModelo.getCurso() != null) {
-                existente.setCurso(alunoModelo.getCurso());
-            }
-            if (alunoModelo.getCodigoVer() != null) {
-                existente.setCodigoVer(alunoModelo.getCodigoVer());
-            }
-            if (alunoModelo.getSenha() != null) {
-                existente.setSenhaEmTexto(alunoModelo.getSenha());
-            }
-
-            if (alunoModelo.getOrientadorProvisorio() != null) {
-                orientacaoServico.atribuirOrientadorProvisorio(email, alunoModelo.getOrientadorProvisorio());
-            }
-
-            if (alunoModelo.getCoorientadorProvisorio() != null) {
-                orientacaoServico.atribuirCoorientadorProvisorio(email, alunoModelo.getCoorientadorProvisorio());
-            }
+            if (alunoModelo.getNome() != null) existente.setNome(alunoModelo.getNome());
+            if (alunoModelo.getTelefone() != null) existente.setTelefone(alunoModelo.getTelefone());
+            if (alunoModelo.getOrientador() != null) existente.setOrientador(alunoModelo.getOrientador());
+            if (alunoModelo.getCoorientador() != null) existente.setCoorientador(alunoModelo.getCoorientador());
+            if (alunoModelo.getCurso() != null) existente.setCurso(alunoModelo.getCurso());
+            if (alunoModelo.getCodigoVer() != null) existente.setCodigoVer(alunoModelo.getCodigoVer());
+            if (alunoModelo.getSenha() != null) existente.setSenhaEmTexto(alunoModelo.getSenha());
+            if (alunoModelo.getOrientadorProvisorio() != null) orientacaoServico.atribuirOrientadorProvisorio(email, alunoModelo.getOrientadorProvisorio());
+            if (alunoModelo.getCoorientadorProvisorio() != null) orientacaoServico.atribuirCoorientadorProvisorio(email, alunoModelo.getCoorientadorProvisorio());
 
             return new ResponseEntity<>(alunoRepositorio.save(existente), HttpStatus.OK);
         }
+        
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 

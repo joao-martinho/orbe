@@ -58,30 +58,14 @@ public class ProfessorServico {
         if (optional.isPresent()) {
             ProfessorModelo existente = optional.get();
 
-            if (professorModelo.getNome() != null) {
-                existente.setNome(professorModelo.getNome());
-            }
-            if (professorModelo.getTelefone() != null) {
-                existente.setTelefone(professorModelo.getTelefone());
-            }
-            if (professorModelo.getOrientandos() != null) {
-                existente.setOrientandos(professorModelo.getOrientandos());
-            }
-            if (professorModelo.getOrientandosProvisorios() != null) {
-                existente.setOrientandosProvisorios(professorModelo.getOrientandosProvisorios());
-            }
-            if (professorModelo.getCoorientandos() != null) {
-                existente.setCoorientandos(professorModelo.getCoorientandos());
-            }
-            if (professorModelo.getSenha() != null) {
-                existente.setSenhaEmTexto(professorModelo.getSenha());
-            }
-            if (professorModelo.getCodigoVer() != null) {
-                existente.setCodigoVer(professorModelo.getCodigoVer());
-            }
-            if (professorModelo.getPapeis() != null && !professorModelo.getPapeis().isEmpty()) {
-                existente.setPapeis(professorModelo.getPapeis());
-            }
+            if (professorModelo.getNome() != null) existente.setNome(professorModelo.getNome());
+            if (professorModelo.getTelefone() != null) existente.setTelefone(professorModelo.getTelefone());
+            if (professorModelo.getOrientandos() != null) existente.setOrientandos(professorModelo.getOrientandos());
+            if (professorModelo.getOrientandosProvisorios() != null) existente.setOrientandosProvisorios(professorModelo.getOrientandosProvisorios());
+            if (professorModelo.getCoorientandos() != null) existente.setCoorientandos(professorModelo.getCoorientandos());
+            if (professorModelo.getSenha() != null) existente.setSenhaEmTexto(professorModelo.getSenha());
+            if (professorModelo.getCodigoVer() != null) existente.setCodigoVer(professorModelo.getCodigoVer());
+            if (professorModelo.getPapeis() != null && !professorModelo.getPapeis().isEmpty()) existente.setPapeis(professorModelo.getPapeis());
 
             return new ResponseEntity<>(professorRepositorio.save(existente), HttpStatus.OK);
         }
