@@ -65,9 +65,9 @@ public class ProfessorControle {
         return this.professorServico.alterarProfessorTotal(email, professorModelo);
     }
 
-    @PatchMapping("/remover-provisorio/{email}/{emailAluno}")
-    public ResponseEntity<AlunoModelo> removerProvisorio(@PathVariable String email, @PathVariable String emailAluno) {
-        return this.professorServico.removerProvisorio(email, emailAluno);
+    @PatchMapping("/remover-orientando/{emailAluno}")
+    public ResponseEntity<AlunoModelo> removerOrientandoProvisorio(@PathVariable String emailAluno) {
+        return this.professorServico.removerOrientandoProvisorio(emailAluno);
     }
 
     @PatchMapping("/{email}")

@@ -165,8 +165,8 @@ public class ProfessorServico {
         return new ResponseEntity<>(orientandosProvisorios, HttpStatus.OK);
     }
 
-    public ResponseEntity<AlunoModelo> removerProvisorio(String emailProfessor, String emailAluno) {
-        return orientacaoServico.removerRelacaoProvisoria(emailAluno, emailProfessor);
+    public ResponseEntity<AlunoModelo> removerOrientandoProvisorio(String emailAluno) {
+        return orientacaoServico.removerRelacaoProvisoria(emailAluno);
     }
 
     public ResponseEntity<Iterable<AlunoModelo>> listarCoorientandos(String email) {

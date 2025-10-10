@@ -24,57 +24,35 @@ public class OrientacaoServico {
     private final AlunoRepositorio alunoRepositorio;
     private final TermoRepositorio termoRepositorio;
 
-    public ResponseEntity<AlunoModelo> removerRelacaoProvisoria(String emailAluno, String emailSolicitante) {
-        if (emailAluno == null || emailSolicitante == null) {
+    public ResponseEntity<AlunoModelo> removerRelacaoProvisoria(String emailAluno) {
+        if (emailAluno == null) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         String emailAlunoNorm = emailAluno.trim().toLowerCase();
-        String emailSolicitanteNorm = emailSolicitante.trim().toLowerCase();
-
         AlunoModelo aluno = alunoRepositorio.findByEmail(emailAlunoNorm);
         if (aluno == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        ProfessorModelo orientador = aluno.getOrientadorProvisorio() != null ?
-                professorRepositorio.findByEmail(aluno.getOrientadorProvisorio().trim().toLowerCase()) : null;
-
-        ProfessorModelo coorientador = aluno.getCoorientadorProvisorio() != null ?
-                professorRepositorio.findByEmail(aluno.getCoorientadorProvisorio().trim().toLowerCase()) : null;
-
-        boolean solicitanteEhAluno = emailSolicitanteNorm.equals(emailAlunoNorm);
-        boolean solicitanteEhOrientador = orientador != null && emailSolicitanteNorm.equals(orientador.getEmail());
-        boolean solicitanteEhCoorientador = coorientador != null && emailSolicitanteNorm.equals(coorientador.getEmail());
-
-        if (solicitanteEhAluno || solicitanteEhOrientador) {
-            if (orientador != null) {
-                List<String> orientandosProvisorios = orientador.getOrientandosProvisorios();
-                if (orientandosProvisorios != null) orientandosProvisorios.remove(emailAlunoNorm);
-                orientador.setOrientandosProvisorios(orientandosProvisorios);
+        if (aluno.getOrientadorProvisorio() != null) {
+            ProfessorModelo orientador = professorRepositorio.findByEmail(aluno.getOrientadorProvisorio().trim().toLowerCase());
+            if (orientador != null && orientador.getOrientandosProvisorios() != null) {
+                orientador.getOrientandosProvisorios().remove(emailAlunoNorm);
                 professorRepositorio.save(orientador);
             }
-
-            if (coorientador != null) {
-                List<String> coorientandosProvisorios = coorientador.getCoorientandosProvisorios();
-                if (coorientandosProvisorios != null) coorientandosProvisorios.remove(emailAlunoNorm);
-                coorientador.setCoorientandosProvisorios(coorientandosProvisorios);
-                professorRepositorio.save(coorientador);
-            }
-
-            aluno.setOrientadorProvisorio(null);
-            aluno.setCoorientadorProvisorio(null);
-        } else if (solicitanteEhCoorientador && coorientador != null) {
-            List<String> coorientandosProvisorios = coorientador.getCoorientandosProvisorios();
-            if (coorientandosProvisorios != null) coorientandosProvisorios.remove(emailAlunoNorm);
-            coorientador.setCoorientandosProvisorios(coorientandosProvisorios);
-            professorRepositorio.save(coorientador);
-
-            aluno.setCoorientadorProvisorio(null);
-        } else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
+        if (aluno.getCoorientadorProvisorio() != null) {
+            ProfessorModelo coorientador = professorRepositorio.findByEmail(aluno.getCoorientadorProvisorio().trim().toLowerCase());
+            if (coorientador != null && coorientador.getCoorientandosProvisorios() != null) {
+                coorientador.getCoorientandosProvisorios().remove(emailAlunoNorm);
+                professorRepositorio.save(coorientador);
+            }
+        }
+
+        aluno.setOrientadorProvisorio(null);
+        aluno.setCoorientadorProvisorio(null);
         alunoRepositorio.save(aluno);
 
         TermoModelo termoModelo = termoRepositorio.findByEmailAluno(emailAlunoNorm);

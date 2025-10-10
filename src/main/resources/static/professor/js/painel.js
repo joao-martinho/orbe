@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!alunoSelecionado || !colSelecionado) return;
 
     try {
-      const urlOri = `/professores/remover-provisorio/${encodeURIComponent(email)}/${encodeURIComponent(alunoSelecionado)}`;
+      const urlOri = `/professores/remover-orientando/${encodeURIComponent(alunoSelecionado)}`;
       const resOri = await fetch(urlOri, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' }

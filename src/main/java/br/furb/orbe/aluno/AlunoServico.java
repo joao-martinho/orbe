@@ -85,7 +85,7 @@ public class AlunoServico {
         alunoRepositorio.limparCodigoVer(LocalDateTime.now().minusMinutes(10));
     }
 
-    public ResponseEntity<AlunoModelo> removerProvisorio(String emailAluno, String emailProfessor) {
-        return orientacaoServico.removerRelacaoProvisoria(emailAluno, emailProfessor);
+    public ResponseEntity<AlunoModelo> removerOrientadorProvisorio(String emailAluno) {
+        return orientacaoServico.removerRelacaoProvisoria(emailAluno);
     }
 }

@@ -49,9 +49,9 @@ public class AlunoControle {
         return this.alunoServico.alterarAlunoParcial(email, alunoModelo);
     }
 
-    @PatchMapping("/remover-provisorio/{email}/{emailProfessor}")
-    public ResponseEntity<AlunoModelo> removerProvisorio(@PathVariable String email, @PathVariable String emailProfessor) {
-        return this.alunoServico.removerProvisorio(email, emailProfessor);
+    @PatchMapping("/remover-orientador/{email}")
+    public ResponseEntity<AlunoModelo> removerOrientadorProvisorio(@PathVariable String email) {
+        return this.alunoServico.removerOrientadorProvisorio(email);
     }
 
     @DeleteMapping("/{email}")

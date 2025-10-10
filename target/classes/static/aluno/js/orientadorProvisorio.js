@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mensagem.innerHTML = '';
 
     try {
-      const urlOri = `/alunos/remover-provisorio/${encodeURIComponent(alunoEmail)}/${encodeURIComponent(orientadorEmail)}`;
+      const urlOri = `/alunos/remover-orientador/${encodeURIComponent(alunoEmail)}`;
       const resOri = await fetch(urlOri, { method: 'PATCH' });
 
       if (!resOri.ok && resOri.status !== 403) {
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (coorientadorEmail) {
-        const urlCoor = `/alunos/remover-provisorio/${encodeURIComponent(alunoEmail)}/${encodeURIComponent(coorientadorEmail)}`;
+        const urlCoor = `/alunos/remover-orientador/${encodeURIComponent(alunoEmail)}`;
         const resCoor = await fetch(urlCoor, { method: 'PATCH' });
 
         if (!resCoor.ok && resCoor.status !== 403) {
