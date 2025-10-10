@@ -133,7 +133,7 @@ classDiagram
         -boolean profTcc1
     }
 
-    %% Relacionamentos (via e-mails)
+    %% Relacionamentos (via emails)
     AlunoModelo --> ProfessorModelo : orientadorProvisorio
     AlunoModelo --> ProfessorModelo : orientador
     AlunoModelo --> ProfessorModelo : coorientadorProvisorio
