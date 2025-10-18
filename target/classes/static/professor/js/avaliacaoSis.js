@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     nomeArquivoParecerProfTcc1: document.getElementById('nomeArquivoParecerProfTcc1'),
     notaAvaliadorPreProjeto: document.getElementById('nota1'),
     notaProfTcc1PreProjeto: document.getElementById('nota2'),
-    notaDefesaQualificacao: document.getElementById('nota3'),
     notaAvaliadorProjeto: document.getElementById('nota4'),
     notaProfTcc1Projeto: document.getElementById('nota5'),
     mediaFinal: document.getElementById('mediaFinal'),
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   let banca = null;
-  let papelUsuario = null; // 'avaliador' ou 'prof_tcc1'
+  let papelUsuario = null;
   const alunosCache = {};
   const professoresCache = {};
 
@@ -74,32 +73,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const parecerAvaliador = document.getElementById('parecerAvaliador');
     const parecerProf = document.getElementById('parecerProfessor');
 
-    const { notaAvaliadorPreProjeto, notaAvaliadorProjeto, 
-            notaProfTcc1PreProjeto, notaProfTcc1Projeto, notaDefesaQualificacao } = campos;
+    const { notaAvaliadorPreProjeto, notaAvaliadorProjeto, notaProfTcc1PreProjeto, notaProfTcc1Projeto } = campos;
 
-    // Todos podem baixar arquivos
     preProjeto.disabled = projeto.disabled = parecerAvaliador.disabled = parecerProf.disabled = false;
 
     if (papelUsuario === 'avaliador') {
-      // Uploads
       preProjeto.disabled = projeto.disabled = true;
       preProjeto.title = projeto.title = "Você não pode enviar este arquivo";
       [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
       parecerProf.disabled = true;
 
-      // Notas
       notaAvaliadorPreProjeto.disabled = notaAvaliadorProjeto.disabled = false;
-      notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = notaDefesaQualificacao.disabled = true;
-      [notaProfTcc1PreProjeto, notaProfTcc1Projeto, notaDefesaQualificacao].forEach(el => el.classList.add('disabled-field'));
+      notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = true;
+      [notaProfTcc1PreProjeto, notaProfTcc1Projeto].forEach(el => el.classList.add('disabled-field'));
     } else if (papelUsuario === 'prof_tcc1') {
-      // Uploads
       parecerAvaliador.disabled = true;
 
-      // Notas
-      notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = notaDefesaQualificacao.disabled = false;
+      notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = false;
       notaAvaliadorPreProjeto.disabled = notaAvaliadorProjeto.disabled = true;
       [notaAvaliadorPreProjeto, notaAvaliadorProjeto].forEach(el => el.classList.add('disabled-field'));
     }
+
+    preProjeto.disabled = true;
+    projeto.disabled = true;
+    preProjeto.title = projeto.title = "Envio desabilitado";
+    [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
   }
 
   function formatStatusBadge(status) {
@@ -133,7 +131,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     campos.notaAvaliadorPreProjeto.value = banca.notaAvaliadorPreProjeto ?? '';
     campos.notaProfTcc1PreProjeto.value = banca.notaProfTcc1PreProjeto ?? '';
-    campos.notaDefesaQualificacao.value = banca.notaDefesaQualificacao ?? '';
     campos.notaAvaliadorProjeto.value = banca.notaAvaliadorProjeto ?? '';
     campos.notaProfTcc1Projeto.value = banca.notaProfTcc1Projeto ?? '';
 
@@ -146,11 +143,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   function calcularMedia() {
     const n1 = parseFloat(campos.notaProfTcc1PreProjeto.value) || 0;
     const n2 = parseFloat(campos.notaAvaliadorPreProjeto.value) || 0;
-    const n3 = parseFloat(campos.notaDefesaQualificacao.value) || 0;
-    const n4 = parseFloat(campos.notaProfTcc1Projeto.value) || 0;
-    const n5 = parseFloat(campos.notaAvaliadorProjeto.value) || 0;
-    if ([n1, n2, n3, n4, n5].some(v => v === 0)) return null;
-    return (n1 * 0.1) + (n2 * 0.2) + (n3 * 0.1) + (n4 * 0.2) + (n5 * 0.4);
+    const n3 = parseFloat(campos.notaProfTcc1Projeto.value) || 0;
+    const n4 = parseFloat(campos.notaAvaliadorProjeto.value) || 0;
+    if ([n1, n2, n3, n4].some(v => v === 0)) return null;
+    return (n1 * 0.1) + (n2 * 0.2) + (n3 * 0.25) + (n4 * 0.45);
   }
 
   async function salvarNotas() {
@@ -166,7 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (papelUsuario === 'prof_tcc1') {
       payload.notaProfTcc1PreProjeto = parseFloat(campos.notaProfTcc1PreProjeto.value) || null;
       payload.notaProfTcc1Projeto = parseFloat(campos.notaProfTcc1Projeto.value) || null;
-      payload.notaDefesaQualificacao = parseFloat(campos.notaDefesaQualificacao.value) || null;
     }
 
     payload.mediaFinal = media;

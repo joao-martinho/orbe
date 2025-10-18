@@ -74,32 +74,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     const parecerAvaliador = document.getElementById('parecerAvaliador');
     const parecerProf = document.getElementById('parecerProfessor');
 
-    const { notaAvaliadorPreProjeto, notaAvaliadorProjeto, 
-            notaProfTcc1PreProjeto, notaProfTcc1Projeto, notaDefesaQualificacao } = campos;
+    const {
+      notaAvaliadorPreProjeto, notaAvaliadorProjeto, 
+      notaProfTcc1PreProjeto, notaProfTcc1Projeto, notaDefesaQualificacao 
+    } = campos;
 
-    // Todos podem baixar arquivos
     preProjeto.disabled = projeto.disabled = parecerAvaliador.disabled = parecerProf.disabled = false;
 
     if (papelUsuario === 'avaliador') {
-      // Uploads
       preProjeto.disabled = projeto.disabled = true;
       preProjeto.title = projeto.title = "Você não pode enviar este arquivo";
       [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
       parecerProf.disabled = true;
 
-      // Notas
       notaAvaliadorPreProjeto.disabled = notaAvaliadorProjeto.disabled = false;
       notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = notaDefesaQualificacao.disabled = true;
       [notaProfTcc1PreProjeto, notaProfTcc1Projeto, notaDefesaQualificacao].forEach(el => el.classList.add('disabled-field'));
     } else if (papelUsuario === 'prof_tcc1') {
-      // Uploads
       parecerAvaliador.disabled = true;
 
-      // Notas
       notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = notaDefesaQualificacao.disabled = false;
       notaAvaliadorPreProjeto.disabled = notaAvaliadorProjeto.disabled = true;
       [notaAvaliadorPreProjeto, notaAvaliadorProjeto].forEach(el => el.classList.add('disabled-field'));
     }
+
+    preProjeto.disabled = true;
+    projeto.disabled = true;
+    preProjeto.title = projeto.title = "Envio desabilitado";
+    [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
   }
 
   function formatStatusBadge(status) {

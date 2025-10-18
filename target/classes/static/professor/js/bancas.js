@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       t.nomeAluno = await getNomeAluno(t.emailAluno);
       t.nomeOrientador = await getNomeProfessor(t.emailOrientador);
       t.nomeCoorientador = t.emailCoorientador ? await getNomeProfessor(t.emailCoorientador) : '—';
-      t.nomeAvaliador = t.emailProfessor1 ? await getNomeProfessor(t.emailProfessor1) : '—';
+      t.nomeAvaliador = t.emailAvaliador ? await getNomeProfessor(t.emailAvaliador) : '—';
     }
   }
 
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const option = document.createElement('option');
       option.value = prof.email;
       option.textContent = prof.nome;
-      if (prof.email === termo.emailProfessor1) option.selected = true;
+      if (prof.email === termo.emailAvaliador) option.selected = true;
       selectAvaliador.appendChild(option);
     });
 
@@ -202,35 +202,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!termoAtual) return;
 
-    const arquivoInput = document.getElementById('arquivo');
-    let arquivoBase64 = null;
-    let nomeArquivo = null;
-
-    if (arquivoInput.files.length > 0) {
-      const arquivo = arquivoInput.files[0];
-      nomeArquivo = arquivo.name;
-      arquivoBase64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(arquivo);
-      });
-    } else {
-      return;
-    }
-
     const payload = {
       emailAluno: termoAtual.emailAluno,
       emailOrientador: termoAtual.emailOrientador,
       curso: termoAtual.curso,
       titulo: termoAtual.titulo,
       resumo: termoAtual.resumo,
-      emailProfessor1: document.getElementById('avaliador').value || null,
+      emailAvaliador: document.getElementById('avaliador').value || null,
       data: document.getElementById('dataApresentacao').value || null,
       hora: document.getElementById('horaApresentacao').value || null,
-      marcada: true,
-      nomeArquivo,
-      arquivoBase64
+      marcada: true
     };
 
     try {
@@ -242,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!res.ok) throw new Error('Erro ao salvar');
 
-      termoAtual.emailProfessor1 = payload.emailProfessor1;
+      termoAtual.emailAvaliador = payload.emailAvaliador;
       termoAtual.data = payload.data;
       termoAtual.hora = payload.hora;
       termoAtual.marcada = true;
