@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'professor') {
-    alert('Você não tem permissão para acessar esta página.');
+  const emailProfessor = localStorage.getItem('email')
+  if (tipo !== 'professor' || !emailProfessor || localStorage.getItem('prof_tcc1') !== 'true') {
+    alert('Você não tem permissão para acessar esta página :(');
     window.location.href = '../login.html';
-    return;
   }
 
   const btnSair = document.getElementById('btnSair');
@@ -11,8 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const formulario = document.getElementById('formularioEntrega');
   const selectAluno = document.getElementById('orientador');
   const mensagem = document.getElementById('mensagem');
-
-  const emailProfessor = localStorage.getItem('email');
 
   btnSair.addEventListener('click', () => {
     localStorage.clear();

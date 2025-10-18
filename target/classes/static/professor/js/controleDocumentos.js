@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  const tipo = localStorage.getItem('tipo');
+  const emailProfessor = localStorage.getItem('email')
+  if (tipo !== 'professor' || !emailProfessor || localStorage.getItem('prof_tcc1') !== 'true') {
+    alert('Você não tem permissão para acessar esta página :(');
+    window.location.href = '../login.html';
+  }
+
   const btnSair = document.getElementById('btnSair');
   const tabelaBody = document.querySelector('#tabelaEntregas tbody');
 

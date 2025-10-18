@@ -1,16 +1,17 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
-    alert('Você não tem permissão para acessar esta página :(');
-    window.location.href = '../../login.html';
-  }
+	const emailProfessor = localStorage.getItem('email');
+	if (tipo !== 'professor' || !localStorage.getItem('orientando') || !emailProfessor) {
+		alert('Você não tem permissão para acessar esta página :(');
+		window.location.href = '../../login.html';
+	}
 
   const btnSair = document.getElementById('btnSair');
   const tabelaBody = document.querySelector('#tabelaEntregas tbody');
 
   btnSair.addEventListener('click', () => {
     localStorage.clear();
-    window.location.href = '../login.html';
+    window.location.href = '../../login.html';
   });
 
   const email = localStorage.getItem('orientando');

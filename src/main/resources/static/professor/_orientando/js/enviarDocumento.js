@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
-    alert('Você não tem permissão para acessar esta página :(');
-    window.location.href = '../../login.html';
-  }
+	const email = localStorage.getItem('email');
+	if (tipo !== 'professor' || !localStorage.getItem('orientando') || !email) {
+		alert('Você não tem permissão para acessar esta página :(');
+		window.location.href = '../../login.html';
+	}
 
   const btnSair = document.getElementById('btnSair');
   const mensagem = document.getElementById('mensagem');

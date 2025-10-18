@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const tipo = localStorage.getItem('tipo');
-	if (tipo !== 'professor' || !localStorage.getItem('orientando')) {
+	const email = localStorage.getItem('email');
+	if (tipo !== 'professor' || !localStorage.getItem('orientando') || !email) {
 		alert('Você não tem permissão para acessar esta página :(');
 		window.location.href = '../../login.html';
 	}
@@ -12,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 
 	const tabela = document.getElementById('tabelaEntregas').getElementsByTagName('tbody')[0];
-	const email = localStorage.getItem('email');
 
 	function formatarData(isoString) {
 		const data = new Date(isoString);

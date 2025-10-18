@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-  if (tipo !== 'professor') {
+  const emailProfessor = localStorage.getItem('email')
+  if (tipo !== 'professor' || !emailProfessor) {
     alert('Você não tem permissão para acessar esta página :(');
     window.location.href = '../login.html';
-    return;
   }
 
   const btnSair = document.getElementById('btnSair');
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const link = document.createElement('a');
-    link.href = 'orientando/painel.html';
+    link.href = '_orientando/painel.html';
     link.className = 'btn btn-primary flex-fill';
     link.textContent = 'Acessar';
     buttonContainer.appendChild(link);

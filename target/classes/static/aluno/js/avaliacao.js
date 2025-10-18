@@ -1,227 +1,96 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const btnSair = document.getElementById('btnSair');
-  const btnUpload = document.getElementById('btnUpload');
-  const formNotas = document.getElementById('formNotas');
-  const btnSalvar = document.getElementById('btnSalvar');
-
-  const campos = {
-    aluno: document.getElementById('aluno'),
-    titulo: document.getElementById('titulo'),
-    orientador: document.getElementById('orientador'),
-    dataEHora: document.getElementById('dataEHora'),
-    nomeArquivoPreProjeto: document.getElementById('nomeArquivoPreProjeto'),
-    nomeArquivoProjeto: document.getElementById('nomeArquivoProjeto'),
-    nomeArquivoParecerAvaliador: document.getElementById('nomeArquivoParecerAvaliador'),
-    nomeArquivoParecerProfTcc1: document.getElementById('nomeArquivoParecerProfTcc1'),
-    notaAvaliadorPreProjeto: document.getElementById('nota1'),
-    notaProfTcc1PreProjeto: document.getElementById('nota2'),
-    notaDefesaQualificacao: document.getElementById('nota3'),
-    notaAvaliadorProjeto: document.getElementById('nota4'),
-    notaProfTcc1Projeto: document.getElementById('nota5'),
-    mediaFinal: document.getElementById('mediaFinal'),
-    textStatus: document.getElementById('textStatus')
-  };
-
-  const inputPreProjeto = document.getElementById('preProjeto');
-  const inputProjeto = document.getElementById('projeto');
-  const parecerAvaliador = document.getElementById('parecerAvaliador');
-  const parecerProf = document.getElementById('parecerProfessor');
-
-  let banca = null;
-  const alunosCache = {};
-  const professoresCache = {};
-
   btnSair?.addEventListener('click', () => {
     localStorage.clear();
     window.location.href = '../login.html';
   });
 
-  formNotas.onsubmit = e => e.preventDefault();
+  const emailAluno = localStorage.getItem('email');
+  const tipo = localStorage.getItem('tipo');
 
-  async function verificarAcesso() {
-    const tipo = localStorage.getItem('tipo');
-    const emailAluno = localStorage.getItem('email');
-    if (tipo !== 'aluno' || !emailAluno) {
-      alert('Você não tem permissão para acessar esta página.');
-      window.location.href = '../login.html';
-      return false;
-    }
+  if (tipo !== 'aluno' || !emailAluno) {
+    alert('Você não tem permissão para acessar esta página.');
+    window.location.href = '../login.html';
+    return;
+  }
 
-    const res = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
-    if (!res.ok) {
-      alert('Erro ao carregar dados do aluno.');
-      window.location.href = '../login.html';
-      return false;
-    }
+  try {
+    const resAluno = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
+    if (!resAluno.ok) throw new Error('Erro ao carregar dados do aluno.');
+    const aluno = await resAluno.json();
 
-    const aluno = await res.json();
     if (!aluno.orientador) {
       alert('Você não tem permissão para acessar esta página.');
       window.location.href = '../login.html';
-      return false;
-    }
-
-    return true;
-  }
-
-  async function fetchBanca() {
-    const orientandoEmail = localStorage.getItem('email');
-    if (!orientandoEmail) return;
-
-    try {
-      const res = await fetch(`/bancas`);
-      if (!res.ok) throw new Error("Erro ao buscar bancas.");
-      const bancas = await res.json();
-      banca = bancas.find(b => b.emailAluno === orientandoEmail);
-      if (!banca) return;
-
-      await preencherCampos();
-      desabilitarEdicao();
-      desabilitarUploadsRestritos();
-      configurarDownloads();
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function preencherCampos() {
-    campos.aluno.textContent = await getNomeAluno(banca.emailAluno) || "—";
-    campos.titulo.textContent = banca.titulo || "—";
-    campos.orientador.textContent = await getNomeProfessor(banca.emailOrientador) || "—";
-
-    if (banca.data) {
-      const dataHora = new Date(`${banca.data}T${banca.hora || '00:00'}`);
-      campos.dataEHora.textContent = dataHora.toLocaleString('pt-BR', {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit', hour12: false
-      });
-    } else campos.dataEHora.textContent = "—";
-
-    campos.nomeArquivoPreProjeto.textContent = banca.nomeArquivoPreProjeto || "—";
-    campos.nomeArquivoProjeto.textContent = banca.nomeArquivoProjeto || "—";
-    campos.nomeArquivoParecerAvaliador.textContent = banca.nomeArquivoParecerAvaliador || "—";
-    campos.nomeArquivoParecerProfTcc1.textContent = banca.nomeArquivoParecerProfTcc1 || "—";
-
-    campos.notaAvaliadorPreProjeto.value = banca.notaAvaliadorPreProjeto ?? '';
-    campos.notaProfTcc1PreProjeto.value = banca.notaProfTcc1PreProjeto ?? '';
-    campos.notaDefesaQualificacao.value = banca.notaDefesaQualificacao ?? '';
-    campos.notaAvaliadorProjeto.value = banca.notaAvaliadorProjeto ?? '';
-    campos.notaProfTcc1Projeto.value = banca.notaProfTcc1Projeto ?? '';
-
-    campos.mediaFinal.textContent = banca.mediaFinal ? banca.mediaFinal.toFixed(1) : "—";
-    campos.textStatus.innerHTML = formatStatusBadge(banca.status || "pendente");
-  }
-
-  function desabilitarEdicao() {
-    const notas = [
-      campos.notaAvaliadorPreProjeto,
-      campos.notaProfTcc1PreProjeto,
-      campos.notaDefesaQualificacao,
-      campos.notaAvaliadorProjeto,
-      campos.notaProfTcc1Projeto
-    ];
-    notas.forEach(n => {
-      n.disabled = true;
-      n.title = "Somente leitura";
-      n.classList.add('disabled-field');
-    });
-    btnSalvar.disabled = true;
-    btnSalvar.title = "Somente disponível para avaliadores";
-  }
-
-  function desabilitarUploadsRestritos() {
-    [parecerAvaliador, parecerProf].forEach(el => {
-      if (el) {
-        el.disabled = true;
-        el.title = "Você não pode enviar este arquivo";
-        el.classList.add('disabled-field');
-      }
-    });
-  }
-
-  function formatStatusBadge(status) {
-    if (!status) return "—";
-    const s = status.toLowerCase();
-    let badgeClass = "bg-secondary";
-    if (s === "aprovado") badgeClass = "bg-success";
-    else if (s === "reprovado") badgeClass = "bg-danger";
-    else if (s === "pendente") badgeClass = "bg-warning text-dark";
-    const capitalized = s.charAt(0).toUpperCase() + s.slice(1);
-    return `<span class="badge ${badgeClass}">${capitalized}</span>`;
-  }
-
-  function configurarDownloads() {
-    function downloadArquivo(base64, nome, event) {
-      event?.preventDefault();
-      if (!base64) return;
-      const link = document.createElement('a');
-      link.href = `data:application/octet-stream;base64,${base64}`;
-      link.download = nome;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-
-    document.getElementById('btnDownloadPreProjeto').onclick = (e) =>
-      downloadArquivo(banca.arquivoPreProjeto, banca.nomeArquivoPreProjeto, e);
-    document.getElementById('btnDownloadProjeto').onclick = (e) =>
-      downloadArquivo(banca.arquivoProjeto, banca.nomeArquivoProjeto, e);
-    document.getElementById('btnDownloadParecerAvaliador').onclick = (e) =>
-      downloadArquivo(banca.arquivoParecerAvaliador, banca.nomeArquivoParecerAvaliador, e);
-    document.getElementById('btnDownloadParecerProfTcc1').onclick = (e) =>
-      downloadArquivo(banca.arquivoParecerProfTcc1, banca.nomeArquivoParecerProfTcc1, e);
-  }
-
-  btnUpload?.addEventListener('click', async (e) => {
-    e.preventDefault();
-
-    if (!inputPreProjeto.files.length && !inputProjeto.files.length) {
       return;
     }
 
-    const formData = new FormData();
-    if (inputPreProjeto.files.length) formData.append('arquivoPreProjeto', inputPreProjeto.files[0]);
-    if (inputProjeto.files.length) formData.append('arquivoProjeto', inputProjeto.files[0]);
+    const resBanca = await fetch(`/bancas/aluno/${emailAluno}`);
+    if (!resBanca.ok) throw new Error('Erro ao buscar banca.');
+    const banca = await resBanca.json();
 
-    try {
-      const res = await fetch(`/bancas/${banca.id}`, {
-        method: 'PATCH',
-        body: formData
-      });
+    const tituloEl = document.getElementById('titulo');
+    const orientadorEl = document.getElementById('orientador');
+    const mediaFinalEl = document.getElementById('textData');
+    const statusEl = document.getElementById('textStatus');
+    const dataEHoraEl = document.getElementById('dataEHora');
 
-      if (!res.ok) throw new Error('Erro ao enviar arquivos');
+    tituloEl && (tituloEl.textContent = banca.titulo || '—');
 
-      const data = await res.json();
-
-      if (data.nomeArquivoPreProjeto) campos.nomeArquivoPreProjeto.textContent = data.nomeArquivoPreProjeto;
-      if (data.nomeArquivoProjeto) campos.nomeArquivoProjeto.textContent = data.nomeArquivoProjeto;
-
-    } catch (err) {
-      console.error(err);
+    if (banca.emailOrientador) {
+      const resOrientador = await fetch(`/professores/${banca.emailOrientador}`);
+      if (!resOrientador.ok) throw new Error('Erro ao buscar orientador.');
+      const orientador = await resOrientador.json();
+      orientadorEl && (orientadorEl.textContent = orientador.nome || banca.emailOrientador);
+    } else {
+      orientadorEl && (orientadorEl.textContent = '—');
     }
-  });
 
-  async function getNomeAluno(email) {
-    if (!email) return '—';
-    if (alunosCache[email]) return alunosCache[email];
-    try {
-      const res = await fetch(`/alunos/${email}`);
-      const data = await res.json();
-      alunosCache[email] = data.nome;
-      return data.nome;
-    } catch { return email; }
+    dataEHoraEl && (dataEHoraEl.textContent = formatarDataEHora(banca.data, banca.hora));
+
+    const camposNotas = [
+      { p: document.getElementById('textEmailAluno'), campo: 'nota1' },
+      { p: document.getElementById('textTelefoneAluno'), campo: 'nota2' },
+      { p: document.getElementById('textCurso'), campo: 'nota3' },
+    ];
+
+    const professoresEmails = [banca.emailProfessor1, banca.emailProfessor2, banca.emailProfessor3];
+
+    for (let i = 0; i < 3; i++) {
+      const campo = camposNotas[i];
+      if (!campo.p || !professoresEmails[i]) continue;
+
+      const resProf = await fetch(`/professores/${professoresEmails[i]}`);
+      if (!resProf.ok) throw new Error(`Erro ao buscar professor ${i+1}.`);
+      const prof = await resProf.json();
+
+      campo.p.previousElementSibling && (campo.p.previousElementSibling.textContent = `Nota ${i + 1} - ${prof.nome}:`);
+      campo.p.textContent = banca[campo.campo] != null ? banca[campo.campo].toFixed(2) : '—';
+    }
+
+    mediaFinalEl && (mediaFinalEl.textContent = banca.mediaFinal != null ? banca.mediaFinal.toFixed(2) : '—');
+
+    const notas = [banca.nota1, banca.nota2, banca.nota3];
+    if (notas.some(n => !n || n === 0)) {
+      banca.status = 'pendente';
+      statusEl && (statusEl.innerHTML = '<span class="badge bg-warning text-dark">Pendente</span>');
+    } else if (banca.mediaFinal >= 6) {
+      banca.status = 'aprovado';
+      statusEl && (statusEl.innerHTML = '<span class="badge bg-success">Aprovado</span>');
+    } else {
+      banca.status = 'reprovado';
+      statusEl && (statusEl.innerHTML = '<span class="badge bg-danger">Reprovado</span>');
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert('Ocorreu um erro ao carregar os dados. Verifique o console.');
   }
 
-  async function getNomeProfessor(email) {
-    if (!email) return '—';
-    if (professoresCache[email]) return professoresCache[email];
-    try {
-      const res = await fetch(`/professores/${email}`);
-      const data = await res.json();
-      professoresCache[email] = data.nome;
-      return data.nome;
-    } catch { return email; }
+  function formatarDataEHora(dataStr, horaStr) {
+    if (!dataStr) return '—';
+    const [ano, mes, dia] = dataStr.split('-');
+    let [h, m] = horaStr ? horaStr.split(':') : ['00', '00'];
+    return `${dia.padStart(2,'0')}/${mes.padStart(2,'0')}/${ano}, ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
   }
-
-  if (await verificarAcesso()) fetchBanca();
 });
