@@ -1,6 +1,4 @@
 .vscode
 uploads/
 uploads/**
-target
-target/**
 docker/.env
