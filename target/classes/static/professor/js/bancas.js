@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-  const emailProfessor = localStorage.getItem('email')
+  const emailUsuario = localStorage.getItem('email')
   if (
   tipo !== 'professor' ||
-  !emailProfessor ||
+  !emailUsuario ||
   (
     localStorage.getItem('coord_bcc') !== 'true' &&
     localStorage.getItem('prof_tcc2') !== 'true'

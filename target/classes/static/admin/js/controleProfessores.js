@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
       formularioEdicao.querySelector('#editarNome').value = nome;
 
       formularioEdicao.classList.remove('was-validated');
+      formularioEdicao.querySelectorAll('input').forEach(i => i.classList.remove('is-invalid'));
       modalProfessor.show();
     }
 
@@ -158,16 +159,15 @@ document.addEventListener('DOMContentLoaded', function () {
         carregarProfessores();
         formularioEdicao.reset();
         formularioEdicao.classList.remove('was-validated');
+        formularioEdicao.querySelectorAll('input').forEach(i => i.classList.remove('is-invalid'));
         modalProfessor.hide();
       })
       .catch(err => console.error(err));
   });
 
-  modalProfessorEl.addEventListener('hide.bs.modal', event => {
-    if (!formularioEdicao.checkValidity()) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      aplicarValidacaoVisual(formularioEdicao);
-    }
+  modalProfessorEl.addEventListener('hidden.bs.modal', () => {
+    formularioEdicao.reset();
+    formularioEdicao.classList.remove('was-validated');
+    formularioEdicao.querySelectorAll('input').forEach(i => i.classList.remove('is-invalid'));
   });
 });

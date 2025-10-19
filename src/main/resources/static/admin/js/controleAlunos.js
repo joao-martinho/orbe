@@ -59,13 +59,13 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function carregarAlunos() {
-    fetch('/alunos')
-      .then(response => response.json())
+    fetch('http://localhost:8080/alunos')
+      .then(r => r.json())
       .then(data => {
         tabela.innerHTML = '';
         data.forEach(aluno => {
-          const fileira = tabela.insertRow();
-          fileira.innerHTML = `
+          const row = tabela.insertRow();
+          row.innerHTML = `
             <td>${aluno.email}</td>
             <td>${aluno.nome}</td>
             <td>${aluno.curso}</td>
@@ -76,72 +76,93 @@ document.addEventListener('DOMContentLoaded', function () {
           `;
         });
       })
-      .catch(erro => console.error('Erro ao carregar dados: ', erro));
+      .catch(console.error);
   }
 
   carregarAlunos();
 
-  formularioCadastro.addEventListener('submit', function (e) {
+  formularioCadastro.addEventListener('submit', e => {
     e.preventDefault();
     if (!validarFormulario(formularioCadastro)) return;
-
     const dados = {
       nome: formularioCadastro.querySelector('#nome').value.trim(),
       email: formularioCadastro.querySelector('#email').value.trim(),
       curso: formularioCadastro.querySelector('input[name="curso"]:checked')?.value
     };
-
-    fetch('/alunos', {
+    fetch('http://localhost:8080/alunos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dados)
     })
-      .then(res => {
-        if (!res.ok) throw new Error('Erro ao cadastrar');
-        return res.json();
+      .then(r => {
+        if (!r.ok) throw new Error('Erro ao cadastrar');
+        return r.json();
       })
       .then(() => {
         carregarAlunos();
         formularioCadastro.reset();
         formularioCadastro.classList.remove('was-validated');
-        formularioCadastro.querySelectorAll('input').forEach(input => input.classList.remove('is-invalid'));
+        formularioCadastro.querySelectorAll('input').forEach(i => i.classList.remove('is-invalid'));
       })
-      .catch(err => console.error(err));
+      .catch(console.error);
   });
 
-  document.addEventListener('click', function (e) {
-    if (e.target.classList.contains('btn-editar')) {
-      const fileira = e.target.closest('tr');
-      const email = fileira.cells[0].textContent;
-      const nome = fileira.cells[1].textContent;
-      const curso = fileira.cells[2].textContent;
+  formularioEdicao.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validarFormulario(formularioEdicao)) return;
+    const email = formularioEdicao.querySelector('#editarEmail').value;
+    const dados = {
+      nome: formularioEdicao.querySelector('#editarNome').value.trim(),
+      curso: formularioEdicao.querySelector('input[name="curso"]:checked')?.value
+    };
+    fetch(`http://localhost:8080/alunos/${email}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dados)
+    })
+      .then(r => {
+        if (!r.ok) throw new Error('Erro ao atualizar');
+        return r.json();
+      })
+      .then(() => {
+        modalAluno.hide();
+        carregarAlunos();
+      })
+      .catch(console.error);
+  });
 
+  document.addEventListener('click', e => {
+    const btnEditar = e.target.closest('.btn-editar');
+    const btnDeletar = e.target.closest('.btn-deletar');
+    if (btnEditar) {
+      const tr = btnEditar.closest('tr');
+      const email = tr.cells[0].textContent;
+      const nome = tr.cells[1].textContent;
+      const curso = tr.cells[2].textContent;
       formularioEdicao.querySelector('#editarEmail').value = email;
       formularioEdicao.querySelector('#editarNome').value = nome;
-      formularioEdicao.querySelector(`input[name="editarCurso"][value="${curso}"]`).checked = true;
-
+      formularioEdicao.querySelector(`input[name="curso"][value="${curso}"]`).checked = true;
       formularioEdicao.classList.remove('was-validated');
-      formularioEdicao.querySelectorAll('input').forEach(input => input.classList.remove('is-invalid'));
+      formularioEdicao.querySelectorAll('input').forEach(i => i.classList.remove('is-invalid'));
       modalAluno.show();
     }
-
-    if (e.target.classList.contains('btn-deletar')) {
-      emailParaDeletar = e.target.dataset.email;
+    if (btnDeletar) {
+      emailParaDeletar = btnDeletar.dataset.email;
       modalConfirm.show();
     }
   });
 
   modalConfirmEl.addEventListener('shown.bs.modal', () => {
-    const btnConfirmDelete = document.getElementById('confirmDelete');
-    btnConfirmDelete.onclick = function () {
+    const btnConfirm = document.getElementById('confirmDelete');
+    btnConfirm.onclick = function () {
       if (!emailParaDeletar) return;
-      fetch(`/alunos/${emailParaDeletar}`, { method: 'DELETE' })
+      fetch(`http://localhost:8080/alunos/${emailParaDeletar}`, { method: 'DELETE' })
         .then(() => {
           carregarAlunos();
           emailParaDeletar = null;
           modalConfirm.hide();
         })
-        .catch(err => console.error(err));
+        .catch(console.error);
     };
   });
 });

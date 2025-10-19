@@ -111,7 +111,7 @@ formPrimeiroAcesso.addEventListener('submit', async (e) => {
 
         if (!resPatch.ok) throw new Error('Houve um erro. Verifique suas credenciais e tente novamente.');
 
-        mostrarMensagem('Senha alterada com sucesso.', 'success');
+        mostrarMensagem('Senha criada com sucesso.', 'success');
 
         emailInput.value = '';
         telefoneInput.value = '';
