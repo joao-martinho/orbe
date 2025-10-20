@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const texto = await res.text();
             if (!res.ok) {
-                mostrarMensagem(texto || 'Houve um erro. Verifique suas credenciais e tente novamente.');
+                mostrarMensagem('Houve um erro. Verifique suas credenciais e tente novamente.');
                 return;
             }
 
-            mostrarMensagem(texto || `O código de verificação foi enviado para ${email}.`, 'success');
+            mostrarMensagem(`O código de verificação foi enviado para ${email}.`, 'success');
             codigoVerInput.focus();
         } catch (err) {
             console.error(err);
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const textoVer = await resVerificacao.text();
             if (!resVerificacao.ok) {
-                mostrarMensagem(textoVer || 'Código inválido.');
+                mostrarMensagem('Código inválido.');
                 return;
             }
 
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             codigoVerInput.value = '';
         } catch (err) {
             console.error(err);
-            mostrarMensagem(err.message);
+            mostrarMensagem('Houve um erro. Verifique suas credenciais e tente novamente.');
         }
     });
 
