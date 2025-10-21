@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const perfilContainer = document.getElementById('perfilContainer');
 
   const termoInfo = {
+    termoAluno: document.getElementById('termoAluno'),
     termoTitulo: document.getElementById('termoTitulo'),
     termoOrientador: document.getElementById('termoOrientador'),
     termoCoorientadorContainer: document.getElementById('termoCoorientadorContainer'),
@@ -83,7 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function buscarNomeAluno(email) {
+    if (!email) return '—';
+    try {
+      const res = await fetch(`/alunos/${encodeURIComponent(email)}`);
+      if (!res.ok) throw new Error('Erro ao buscar aluno.');
+      const dados = await res.json();
+      return dados.nome || '—';
+    } catch (err) {
+      console.error(err);
+      return '—';
+    }
+  }
+
   async function atualizarVisualizacaoTermo(termo) {
+    termoInfo.termoAluno.textContent = await buscarNomeAluno(termo.emailAluno);
     termoInfo.termoTitulo.textContent = termo.titulo;
     termoInfo.termoOrientador.textContent = await buscarNomeProfessor(termo.emailOrientador);
 
@@ -258,57 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const resText = await resPost.text();
       if (resText) termoSalvo = JSON.parse(resText);
 
-      if (parceiroData) {
-        try {
-          const termoParceiro = {
-            titulo: termo.titulo,
-            emailAluno: parceiroData.email,
-            nomeAluno: parceiroData.nome,
-            telefoneAluno: parceiroData.telefone,
-            cursoAluno: parceiroData.curso,
-            emailParceiro: aluno.email,
-            nomeParceiro: aluno.nome,
-            ano: termo.ano,
-            semestre: termo.semestre,
-            resumo: termo.resumo,
-            emailOrientador: termo.emailOrientador,
-            emailCoorientador: termo.emailCoorientador,
-            perfilCoorientador: termo.perfilCoorientador,
-            statusOrientador: "pendente",
-            statusCoorientador: "pendente",
-            statusProfessorTcc1: "pendente",
-            statusFinal: "pendente",
-            criadoEm: termo.criadoEm,
-          };
-
-          let metodoParceiro = 'POST';
-          let urlParceiro = '/termos';
-
-          const resTermoExistenteParceiro = await fetch(`/termos/aluno/${encodeURIComponent(parceiroData.email)}`);
-          if (resTermoExistenteParceiro.ok) {
-            let termoExistenteParceiro = null;
-            const textParceiro = await resTermoExistenteParceiro.text();
-            if (textParceiro) termoExistenteParceiro = JSON.parse(textParceiro);
-
-            if (termoExistenteParceiro && termoExistenteParceiro.id) {
-              metodoParceiro = 'PATCH';
-              urlParceiro = `/termos/${encodeURIComponent(termoExistenteParceiro.id)}`;
-            }
-          }
-
-          await fetch(urlParceiro, {
-            method: metodoParceiro,
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(termoParceiro),
-          });
-
-        } catch (errorParceiro) {
-          console.log('Erro ao criar termo para o parceiro:', errorParceiro);
-        }
-      }
-
       mensagem.innerHTML = parceiroData ? 
-        `<div class="alert alert-success">Termo de compromisso enviado com sucesso para você e seu parceiro.</div>` :
+        `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>` :
         `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>`;
       if (termoSalvo) atualizarVisualizacaoTermo(termoSalvo);
 

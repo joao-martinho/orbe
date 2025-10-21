@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!termos.length) {
         const placeholder = document.createElement('tr');
         placeholder.innerHTML = `
-          <td colspan="6" style="text-align:center; color:gray;">Você ainda não recebeu nenhum termo de compromisso.</td>
+          <td colspan="7" style="text-align:center; color:gray;">Você ainda não recebeu nenhum termo de compromisso.</td>
         `;
         listaTermos.appendChild(placeholder);
         return;
@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${termo.nomeAluno || termo.aluno?.nome || ''}</td>
+          <td class="campoParceiro">${termo.nomeParceiro ? termo.nomeParceiro : '—'}</td>
           <td>${termo.titulo || ''}</td>
           <td data-email="${termo.emailOrientador || termo.orientador?.email || ''}" class="campoOrientador">Carregando...</td>
           <td data-email="${termo.emailCoorientador || termo.coorientador?.email || ''}" class="campoCoorientador">Carregando...</td>
@@ -78,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error(err);
       const placeholder = document.createElement('tr');
       placeholder.innerHTML = `
-        <td colspan="6" style="text-align:center; color:gray;">Você ainda não recebeu nenhum termo de compromisso.</td>
+        <td colspan="7" style="text-align:center; color:gray;">Você ainda não recebeu nenhum termo de compromisso.</td>
       `;
       listaTermos.appendChild(placeholder);
     }
@@ -109,6 +110,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('modalTitulo').textContent = termo.titulo;
     document.getElementById('modalResumo').textContent = termo.resumo;
     document.getElementById('modalPerfilCoorientador').textContent = termo.perfilCoorientador || '—';
+
+    // Mostrar parceiro se existir
+    const modalParceiroContainer = document.getElementById('modalParceiroContainer');
+    if (termo.nomeParceiro) {
+      modalParceiroContainer.style.display = 'block';
+      document.getElementById('modalNomeParceiro').textContent = termo.nomeParceiro;
+    } else {
+      modalParceiroContainer.style.display = 'none';
+    }
 
     const orientadorNome = await buscarNomeProfessor(termo.emailOrientador);
     const coorientadorNome = termo.emailCoorientador

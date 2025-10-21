@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const emailsProcessados = new Set();
+  const parceirosProcesados = new Set();
   let alunoSelecionado = null;
   let colSelecionado = null;
 
@@ -104,6 +105,117 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (emailsProcessados.has(aluno.email)) return;
     emailsProcessados.add(aluno.email);
 
+    // Se o aluno tem parceiro e é SIS, tenta criar um card conjunto
+    if (aluno.parceiro && aluno.curso === 'SIS' && !parceirosProcesados.has(aluno.email)) {
+      criarCardParceiros(aluno, tipoOrientacao, isProvisorio);
+      return;
+    }
+
+    // Se o aluno já foi processado como parte de uma dupla, não cria card individual
+    if (parceirosProcesados.has(aluno.email)) {
+      return;
+    }
+
+    // Cria card individual
+    criarCardIndividual(aluno, tipoOrientacao, isProvisorio);
+  }
+
+  async function criarCardParceiros(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
+    parceirosProcesados.add(aluno.email);
+    parceirosProcesados.add(aluno.parceiro);
+
+    let parceiro = null;
+    try {
+      const response = await fetch(`/alunos/${encodeURIComponent(aluno.parceiro)}`);
+      if (response.ok) {
+        parceiro = await response.json();
+        emailsProcessados.add(parceiro.email);
+      }
+    } catch (err) {
+      console.warn('Não foi possível buscar dados do parceiro:', err);
+    }
+
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.style.display = 'block';
+
+    const card = document.createElement('div');
+    card.className = 'card h-100 shadow-sm position-relative';
+
+    const badgeContainer = document.createElement('div');
+    badgeContainer.className = 'position-absolute top-0 end-0 m-2 d-flex gap-1';
+
+    if (isProvisorio || tipoOrientacao.includes('provisório')) {
+      const badgeProvisorio = document.createElement('span');
+      badgeProvisorio.className = 'badge bg-warning text-dark';
+      badgeProvisorio.textContent = 'Provisório';
+      badgeContainer.appendChild(badgeProvisorio);
+    }
+
+    if (tipoOrientacao.includes('Coorientando')) {
+      const badgeCoorientando = document.createElement('span');
+      badgeCoorientando.className = 'badge bg-info text-dark';
+      badgeCoorientando.textContent = 'Coorientando';
+      badgeContainer.appendChild(badgeCoorientando);
+    }
+
+    card.appendChild(badgeContainer);
+
+    const body = document.createElement('div');
+    body.className = 'card-body d-flex flex-column justify-content-between';
+
+    const title = document.createElement('h5');
+    title.className = 'card-title';
+    
+    const nome1 = aluno.nome.trim().split(/\s+/)[0];
+    const nome2 = parceiro ? parceiro.nome.trim().split(/\s+/)[0] : 'Parceiro';
+    title.textContent = `${nome1} e ${nome2}`;
+
+    const text = document.createElement('p');
+    text.className = 'card-text text-muted';
+    const nomeCompleto2 = parceiro ? parceiro.nome : aluno.parceiro;
+    text.textContent = `Acompanhe o progresso de ${aluno.nome} e ${nomeCompleto2}.`;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'd-flex gap-2 mt-3';
+
+    if (isProvisorio || tipoOrientacao.includes('provisório')) {
+      const btnRemover = document.createElement('button');
+      btnRemover.className = 'btn btn-danger flex-fill';
+      btnRemover.textContent = 'Remover';
+      btnRemover.addEventListener('click', e => {
+        e.stopPropagation();
+        alunoSelecionado = aluno.email;
+        colSelecionado = col;
+        modalConfirm.show();
+      });
+      buttonContainer.appendChild(btnRemover);
+    }
+
+    // Botão simples de acesso (sem dropdown)
+    const link = document.createElement('a');
+    link.href = '_orientando/painel.html';
+    link.className = 'btn btn-primary flex-fill';
+    link.textContent = 'Acessar';
+    link.addEventListener('click', () => {
+      localStorage.setItem('orientando', aluno.email);
+      if (tipoOrientacao.includes('Coorientando')) {
+        localStorage.setItem('isCoorientando', 'true');
+      } else {
+        localStorage.removeItem('isCoorientando');
+      }
+    });
+    buttonContainer.appendChild(link);
+
+    body.appendChild(title);
+    body.appendChild(text);
+    body.appendChild(buttonContainer);
+    card.appendChild(body);
+    col.appendChild(card);
+    secaoAlunos.appendChild(col);
+  }
+
+  function criarCardIndividual(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
     const col = document.createElement('div');
     col.className = 'col';
     col.style.display = 'block';

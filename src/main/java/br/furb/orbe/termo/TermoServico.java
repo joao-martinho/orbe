@@ -131,7 +131,7 @@ public class TermoServico {
     }
 
     public ResponseEntity<TermoModelo> buscarPorEmailAluno(String email) {
-        TermoModelo termoModelo = this.termoRepositorio.findByEmailAluno(email);
+        TermoModelo termoModelo = this.termoRepositorio.findByEmailAlunoOrEmailParceiro(email);
 
         return new ResponseEntity<>(termoModelo, HttpStatus.OK);
     }
