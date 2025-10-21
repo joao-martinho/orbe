@@ -53,6 +53,7 @@ public class OrientacaoServico {
 
         aluno.setOrientadorProvisorio(null);
         aluno.setCoorientadorProvisorio(null);
+        aluno.setParceiro(null);
         alunoRepositorio.save(aluno);
 
         TermoModelo termoModelo = termoRepositorio.findByEmailAluno(emailAlunoNorm);

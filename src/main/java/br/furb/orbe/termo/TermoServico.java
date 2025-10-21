@@ -56,6 +56,9 @@ public class TermoServico {
         if (termoModelo.getTelefoneAluno() != null) termoExistente.setTelefoneAluno(termoModelo.getTelefoneAluno());
         if (termoModelo.getCursoAluno() != null) termoExistente.setCursoAluno(termoModelo.getCursoAluno());
         if (termoModelo.getEmailOrientador() != null) termoExistente.setEmailOrientador(termoModelo.getEmailOrientador());
+        if (termoModelo.getEmailCoorientador() != null) termoExistente.setEmailCoorientador(termoModelo.getEmailCoorientador());
+        if (termoModelo.getEmailParceiro() != null) termoExistente.setEmailParceiro(termoModelo.getEmailParceiro());
+        if (termoModelo.getNomeParceiro() != null) termoExistente.setNomeParceiro(termoModelo.getNomeParceiro());
         if (termoModelo.getPerfilCoorientador() != null) termoExistente.setPerfilCoorientador(termoModelo.getPerfilCoorientador());
         if (termoModelo.getAno() != null) termoExistente.setAno(termoModelo.getAno());
         if (termoModelo.getSemestre() != null) termoExistente.setSemestre(termoModelo.getSemestre());

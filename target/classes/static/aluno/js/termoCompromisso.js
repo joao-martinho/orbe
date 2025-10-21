@@ -53,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
     termoOrientador: document.getElementById('termoOrientador'),
     termoCoorientadorContainer: document.getElementById('termoCoorientadorContainer'),
     termoCoorientador: document.getElementById('termoCoorientador'),
+    termoParceiroContainer: document.getElementById('termoParceiroContainer'),
+    termoParceiro: document.getElementById('termoParceiro'),
     termoPerfilCoorientadorContainer: document.getElementById('termoPerfilCoorientadorContainer'),
     termoPerfilCoorientador: document.getElementById('termoPerfilCoorientador'),
     termoAnoSemestre: document.getElementById('termoAnoSemestre'),
@@ -90,6 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
       termoInfo.termoCoorientador.textContent = await buscarNomeProfessor(termo.emailCoorientador);
     } else {
       termoInfo.termoCoorientadorContainer.style.display = 'none';
+    }
+
+    if (termo.nomeParceiro) {
+      termoInfo.termoParceiroContainer.style.display = 'block';
+      termoInfo.termoParceiro.textContent = termo.nomeParceiro;
+    } else {
+      termoInfo.termoParceiroContainer.style.display = 'none';
     }
 
     termoInfo.termoAnoSemestre.textContent = `${termo.ano}/${termo.semestre}`;
@@ -191,12 +200,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const offset = 3 * 60;
       const dataUTC3 = new Date(data.getTime() - offset * 60 * 1000).toISOString();
 
+      let parceiroData = null;
+      if (aluno.parceiro) {
+        try {
+          const resParceiro = await fetch(`/alunos/${encodeURIComponent(aluno.parceiro)}`);
+          if (resParceiro.ok) {
+            parceiroData = await resParceiro.json();
+          }
+        } catch (error) {
+          console.log('Erro ao buscar dados do parceiro:', error);
+        }
+      }
+
       const termo = {
         titulo: campos.titulo.value.trim(),
         emailAluno: aluno.email,
         nomeAluno: aluno.nome,
         telefoneAluno: aluno.telefone,
         cursoAluno: aluno.curso,
+        emailParceiro: parceiroData ? parceiroData.email : null,
+        nomeParceiro: parceiroData ? parceiroData.nome : null,
         ano: campos.ano.value,
         semestre: campos.semestre.value,
         resumo: campos.resumo.value.trim(),
@@ -235,7 +258,58 @@ document.addEventListener('DOMContentLoaded', () => {
       const resText = await resPost.text();
       if (resText) termoSalvo = JSON.parse(resText);
 
-      mensagem.innerHTML = `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>`;
+      if (parceiroData) {
+        try {
+          const termoParceiro = {
+            titulo: termo.titulo,
+            emailAluno: parceiroData.email,
+            nomeAluno: parceiroData.nome,
+            telefoneAluno: parceiroData.telefone,
+            cursoAluno: parceiroData.curso,
+            emailParceiro: aluno.email,
+            nomeParceiro: aluno.nome,
+            ano: termo.ano,
+            semestre: termo.semestre,
+            resumo: termo.resumo,
+            emailOrientador: termo.emailOrientador,
+            emailCoorientador: termo.emailCoorientador,
+            perfilCoorientador: termo.perfilCoorientador,
+            statusOrientador: "pendente",
+            statusCoorientador: "pendente",
+            statusProfessorTcc1: "pendente",
+            statusFinal: "pendente",
+            criadoEm: termo.criadoEm,
+          };
+
+          let metodoParceiro = 'POST';
+          let urlParceiro = '/termos';
+
+          const resTermoExistenteParceiro = await fetch(`/termos/aluno/${encodeURIComponent(parceiroData.email)}`);
+          if (resTermoExistenteParceiro.ok) {
+            let termoExistenteParceiro = null;
+            const textParceiro = await resTermoExistenteParceiro.text();
+            if (textParceiro) termoExistenteParceiro = JSON.parse(textParceiro);
+
+            if (termoExistenteParceiro && termoExistenteParceiro.id) {
+              metodoParceiro = 'PATCH';
+              urlParceiro = `/termos/${encodeURIComponent(termoExistenteParceiro.id)}`;
+            }
+          }
+
+          await fetch(urlParceiro, {
+            method: metodoParceiro,
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(termoParceiro),
+          });
+
+        } catch (errorParceiro) {
+          console.log('Erro ao criar termo para o parceiro:', errorParceiro);
+        }
+      }
+
+      mensagem.innerHTML = parceiroData ? 
+        `<div class="alert alert-success">Termo de compromisso enviado com sucesso para você e seu parceiro.</div>` :
+        `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>`;
       if (termoSalvo) atualizarVisualizacaoTermo(termoSalvo);
 
     } catch (error) {

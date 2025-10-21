@@ -43,6 +43,9 @@ public class AlunoModelo {
     private String orientadorProvisorio;
 
     @Email
+    private String parceiro;
+
+    @Email
     private String orientador;
     
     @Email
