@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-	const email = localStorage.getItem('email');
-	if (tipo !== 'professor' || !localStorage.getItem('orientando') || !email) {
-		alert('Você não tem permissão para acessar esta página :(');
-		window.location.href = '../../login.html';
-	}
+  const email = localStorage.getItem('email');
+  if (tipo !== 'professor' || !localStorage.getItem('orientando') || !email) {
+    alert('Você não tem permissão para acessar esta página :(');
+    window.location.href = '../../login.html';
+  }
 
   const btnSair = document.getElementById('btnSair');
   if (btnSair) {
@@ -31,12 +31,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   const elData = document.getElementById('textData');
   const elStatus = document.getElementById('textStatus');
   const comentarioContainer = document.getElementById('comentario');
-
   const btnAprovar = document.getElementById('btnAprovar');
   const btnDevolver = document.getElementById('btnDevolver');
 
-  let termo = null;
+  let termo = {};
   let acaoAtual = null;
+
+  termo = new Proxy(termo, {
+    set(target, prop, value) {
+      target[prop] = value;
+      if (['statusOrientador', 'statusCoorientador', 'statusProfessorTcc1'].includes(prop)) {
+        atualizarBotoes();
+      }
+      return true;
+    }
+  });
 
   function formatarData(isoString) {
     const dt = new Date(isoString);
@@ -75,8 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!res.ok) throw new Error('Erro ao buscar professor');
       const dados = await res.json();
       return dados.nome || '—';
-    } catch (err) {
-      console.error(err);
+    } catch {
       return '—';
     }
   }
@@ -109,56 +117,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function povoarCampos(t) {
     if (!t) return;
-    
+
     if (elEmailAluno1) elEmailAluno1.textContent = t.emailAluno || '—';
     if (elTelefoneAluno1) elTelefoneAluno1.textContent = t.telefoneAluno || '—';
-    
+
     if (t.emailParceiro && t.nomeParceiro) {
-      if (emailAluno2Container) emailAluno2Container.style.display = 'block';
-      if (telefoneAluno2Container) telefoneAluno2Container.style.display = 'block';
-      if (elEmailAluno2) elEmailAluno2.textContent = t.emailParceiro;
-      
-      if (elTelefoneAluno2) {
-        try {
-          const resParceiro = await fetch(`/alunos/${encodeURIComponent(t.emailParceiro)}`);
-          if (resParceiro.ok) {
-            const dadosParceiro = await resParceiro.json();
-            elTelefoneAluno2.textContent = dadosParceiro.telefone || '—';
-          } else {
-            elTelefoneAluno2.textContent = '—';
-          }
-        } catch (err) {
-          console.error('Erro ao buscar telefone do parceiro:', err);
+      emailAluno2Container.style.display = 'block';
+      telefoneAluno2Container.style.display = 'block';
+      elEmailAluno2.textContent = t.emailParceiro;
+
+      try {
+        const resParceiro = await fetch(`/alunos/${encodeURIComponent(t.emailParceiro)}`);
+        if (resParceiro.ok) {
+          const dadosParceiro = await resParceiro.json();
+          elTelefoneAluno2.textContent = dadosParceiro.telefone || '—';
+        } else {
           elTelefoneAluno2.textContent = '—';
         }
+      } catch {
+        elTelefoneAluno2.textContent = '—';
       }
     } else {
-      if (emailAluno2Container) emailAluno2Container.style.display = 'none';
-      if (telefoneAluno2Container) telefoneAluno2Container.style.display = 'none';
+      emailAluno2Container.style.display = 'none';
+      telefoneAluno2Container.style.display = 'none';
     }
-    
-    if (elCurso) elCurso.textContent = t.cursoAluno || '—';
-    if (elTitulo) elTitulo.textContent = t.titulo || '—';
-    if (elResumo) elResumo.textContent = t.resumo || '—';
-    if (elOrientador) elOrientador.textContent = await buscarNomeProfessor(t.emailOrientador);
-    if (elCoorientador) elCoorientador.textContent = await buscarNomeProfessor(t.emailCoorientador);
-    if (elPerfilCoorientador) elPerfilCoorientador.textContent = t.perfilCoorientador || '—';
-    if (elData) elData.textContent = t.criadoEm ? formatarData(t.criadoEm) : '—';
-    if (comentarioContainer) comentarioContainer.value = t.comentario || '';
+
+    elCurso.textContent = t.cursoAluno || '—';
+    elTitulo.textContent = t.titulo || '—';
+    elResumo.textContent = t.resumo || '—';
+    elOrientador.textContent = await buscarNomeProfessor(t.emailOrientador);
+    elCoorientador.textContent = await buscarNomeProfessor(t.emailCoorientador);
+    elPerfilCoorientador.textContent = t.perfilCoorientador || '—';
+    elData.textContent = t.criadoEm ? formatarData(t.criadoEm) : '—';
+    comentarioContainer.value = t.comentario || '';
 
     atualizarBadgeStatus(t.statusProfessorTcc1 || 'pendente');
-
-    atualizarBotoes();
+    Object.assign(termo, t);
   }
 
   function atualizarBotoes() {
     if (!btnAprovar && !btnDevolver) return;
 
-    const comentarioTextarea = comentarioContainer?.querySelector('textarea');
+    const comentarioTextarea = comentarioContainer;
     if (!termo) {
-      if (btnAprovar) btnAprovar.disabled = true;
-      if (btnDevolver) btnDevolver.disabled = true;
-      if (comentarioTextarea) comentarioTextarea.readOnly = true;
+      btnAprovar.disabled = true;
+      btnDevolver.disabled = true;
+      comentarioTextarea.readOnly = true;
       return;
     }
 
@@ -173,59 +177,51 @@ document.addEventListener('DOMContentLoaded', async () => {
       finalizado = statusOrientador !== 'aprovado' || statusCoorientador !== 'pendente';
     }
 
-    if (btnAprovar) btnAprovar.disabled = finalizado;
-    if (btnDevolver) btnDevolver.disabled = finalizado;
-    if (comentarioTextarea) comentarioTextarea.readOnly = finalizado;
+    btnAprovar.disabled = finalizado;
+    btnDevolver.disabled = finalizado;
+    comentarioTextarea.readOnly = finalizado;
   }
 
   async function aprovar() {
     if (!termo) return;
+    const comentario = comentarioContainer.value.trim() || '';
+    const { statusOrientador, statusCoorientador } = termo;
 
-    const comentario = comentarioContainer?.value.trim() || '';
-    const statusOrientador = termo.statusOrientador?.toLowerCase();
-    const statusCoorientador = termo.statusCoorientador?.toLowerCase();
-
-    if (emailUsuario.toLowerCase() === (termo.emailOrientador || '').toLowerCase() && statusOrientador === 'pendente') {
+    if (emailUsuario.toLowerCase() === termo.emailOrientador?.toLowerCase() && statusOrientador === 'pendente') {
       const payload = termo.emailCoorientador
-        ? { statusOrientador: 'aprovado', comentario: comentario }
-        : { statusOrientador: 'aprovado', statusCoorientador: 'aprovado', comentario: comentario };
+        ? { statusOrientador: 'aprovado', comentario }
+        : { statusOrientador: 'aprovado', statusCoorientador: 'aprovado', comentario };
       await atualizarTermo(termo.id, payload);
       await refreshTermo();
-      return;
-    }
-
-    if (emailUsuario.toLowerCase() === (termo.emailCoorientador || '').toLowerCase() && statusOrientador === 'aprovado' && statusCoorientador === 'pendente') {
-      await atualizarTermo(termo.id, { statusCoorientador: 'aprovado', comentario: comentario });
+    } else if (emailUsuario.toLowerCase() === termo.emailCoorientador?.toLowerCase() &&
+               statusOrientador === 'aprovado' && statusCoorientador === 'pendente') {
+      await atualizarTermo(termo.id, { statusCoorientador: 'aprovado', comentario });
       await refreshTermo();
     }
   }
 
   async function devolver() {
     if (!termo) return;
+    const comentario = comentarioContainer.value.trim() || '';
+    const { statusOrientador, statusCoorientador } = termo;
 
-    const comentario = comentarioContainer?.value.trim() || '';
-    const statusOrientador = termo.statusOrientador?.toLowerCase();
-    const statusCoorientador = termo.statusCoorientador?.toLowerCase();
-
-    if (emailUsuario.toLowerCase() === (termo.emailOrientador || '').toLowerCase() && statusOrientador === 'pendente') {
+    if (emailUsuario.toLowerCase() === termo.emailOrientador?.toLowerCase() && statusOrientador === 'pendente') {
       const payload = {
         statusOrientador: 'devolvido',
         statusCoorientador: 'devolvido',
         statusProfessorTcc1: 'devolvido',
         statusFinal: 'devolvido',
-        comentario: comentario
+        comentario,
       };
       await atualizarTermo(termo.id, payload);
       await refreshTermo();
-      return;
-    }
-
-    if (emailUsuario.toLowerCase() === (termo.emailCoorientador || '').toLowerCase() && statusOrientador === 'aprovado' && statusCoorientador === 'pendente') {
+    } else if (emailUsuario.toLowerCase() === termo.emailCoorientador?.toLowerCase() &&
+               statusOrientador === 'aprovado' && statusCoorientador === 'pendente') {
       const payload = {
         statusCoorientador: 'devolvido',
         statusProfessorTcc1: 'devolvido',
         statusFinal: 'devolvido',
-        comentario: comentario
+        comentario,
       };
       await atualizarTermo(termo.id, payload);
       await refreshTermo();
@@ -233,10 +229,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function refreshTermo() {
-    termo = await buscarTermo(e);
-    if (termo) await povoarCampos(termo);
+    const t = await buscarTermo(emailAluno1);
+    if (t) await povoarCampos(t);
   }
 
+  // Modal
   const modalHTML = `
     <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
@@ -278,6 +275,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (btnAprovar) btnAprovar.addEventListener('click', () => mostrarModalConfirmacao('aprovar'));
   if (btnDevolver) btnDevolver.addEventListener('click', () => mostrarModalConfirmacao('devolver'));
 
-  termo = await buscarTermo(emailAluno1);
-  if (termo) await povoarCampos(termo);
+  const t = await buscarTermo(emailAluno1);
+  if (t) await povoarCampos(t);
 });
