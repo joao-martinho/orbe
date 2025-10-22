@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
-  const emailProfessor = localStorage.getItem('email')
+  const emailProfessor = localStorage.getItem('email');
   if (tipo !== 'professor' || !emailProfessor) {
     alert('Você não tem permissão para acessar esta página :(');
     window.location.href = '../login.html';
@@ -45,15 +45,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const title = document.createElement('h5');
     title.className = 'card-title';
-    title.textContent = tipo === 'aluno' ? 'Nenhum orientando' :
-                        tipo === 'banca' ? 'Nenhuma banca' :
-                        'Nenhuma função';
+    title.textContent =
+      tipo === 'aluno'
+        ? 'Nenhum orientando'
+        : tipo === 'banca'
+        ? 'Nenhuma banca'
+        : 'Nenhuma função';
 
     const text = document.createElement('p');
     text.className = 'card-text';
-    text.textContent = tipo === 'aluno' ? 'Você ainda não tem nenhum orientando.' :
-                        tipo === 'banca' ? 'Você não faz parte de nenhuma banca de avaliação.' :
-                        'Não há nenhum papel especial atribuído a você.';
+    text.textContent =
+      tipo === 'aluno'
+        ? 'Você ainda não tem nenhum orientando.'
+        : tipo === 'banca'
+        ? 'Você não faz parte de nenhuma banca de avaliação.'
+        : 'Não há nenhum papel especial atribuído a você.';
 
     const button = document.createElement('button');
     button.className = 'btn btn-secondary mt-3';
@@ -69,7 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     secao.appendChild(col);
   }
 
-  secaoFuncoes.querySelectorAll('.col[data-role]').forEach(col => {
+  // ---- Exibição das funções ----
+  secaoFuncoes.querySelectorAll('.col[data-role]').forEach((col) => {
     const role = col.dataset.role;
     if (localStorage.getItem(role) === 'true') {
       col.style.display = 'block';
@@ -97,26 +104,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  if (!secaoFuncoes.querySelector('.col') || Array.from(secaoFuncoes.querySelectorAll('.col')).every(col => col.style.display === 'none')) {
+  if (
+    !secaoFuncoes.querySelector('.col') ||
+    Array.from(secaoFuncoes.querySelectorAll('.col')).every(
+      (col) => col.style.display === 'none'
+    )
+  ) {
     criarCardPlaceholder(secaoFuncoes, 'funcoes');
   }
+
+  // ---- Criação de cards de orientandos ----
 
   function criarCardAluno(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
     if (emailsProcessados.has(aluno.email)) return;
     emailsProcessados.add(aluno.email);
 
-    // Se o aluno tem parceiro e é SIS, tenta criar um card conjunto
     if (aluno.parceiro && aluno.curso === 'SIS' && !parceirosProcesados.has(aluno.email)) {
       criarCardParceiros(aluno, tipoOrientacao, isProvisorio);
       return;
     }
 
-    // Se o aluno já foi processado como parte de uma dupla, não cria card individual
-    if (parceirosProcesados.has(aluno.email)) {
-      return;
-    }
+    if (parceirosProcesados.has(aluno.email)) return;
 
-    // Cria card individual
     criarCardIndividual(aluno, tipoOrientacao, isProvisorio);
   }
 
@@ -166,7 +175,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const title = document.createElement('h5');
     title.className = 'card-title';
-    
     const nome1 = aluno.nome.trim().split(/\s+/)[0];
     const nome2 = parceiro ? parceiro.nome.trim().split(/\s+/)[0] : 'Parceiro';
     title.textContent = `${nome1} e ${nome2}`;
@@ -183,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const btnRemover = document.createElement('button');
       btnRemover.className = 'btn btn-danger flex-fill';
       btnRemover.textContent = 'Remover';
-      btnRemover.addEventListener('click', e => {
+      btnRemover.addEventListener('click', (e) => {
         e.stopPropagation();
         alunoSelecionado = aluno.email;
         colSelecionado = col;
@@ -192,13 +200,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       buttonContainer.appendChild(btnRemover);
     }
 
-    // Botão simples de acesso (sem dropdown)
     const link = document.createElement('a');
     link.href = '_orientando/painel.html';
     link.className = 'btn btn-primary flex-fill';
     link.textContent = 'Acessar';
     link.addEventListener('click', () => {
       localStorage.setItem('orientando', aluno.email);
+      localStorage.setItem('orientandoParceiro', aluno.parceiro);
       if (tipoOrientacao.includes('Coorientando')) {
         localStorage.setItem('isCoorientando', 'true');
       } else {
@@ -260,7 +268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const btnRemover = document.createElement('button');
       btnRemover.className = 'btn btn-danger flex-fill';
       btnRemover.textContent = 'Remover';
-      btnRemover.addEventListener('click', e => {
+      btnRemover.addEventListener('click', (e) => {
         e.stopPropagation();
         alunoSelecionado = aluno.email;
         colSelecionado = col;
@@ -304,7 +312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const response = await fetch(t.url);
       if (!response.ok) throw new Error(`Erro ao buscar ${t.tipo}${t.provisorio ? ' provisórios' : ''}: ${response.status}`);
       const alunos = await response.json();
-      alunos.forEach(aluno => criarCardAluno(aluno, t.tipo, t.provisorio));
+      alunos.forEach((aluno) => criarCardAluno(aluno, t.tipo, t.provisorio));
     }
 
     if (!secaoAlunos.querySelector('.col')) criarCardPlaceholder(secaoAlunos, 'aluno');
@@ -321,17 +329,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             <h5 class="modal-title">Confirmação</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
           </div>
-          <div class="modal-body">
-            Tem certeza de que deseja remover o aluno?
-          </div>
+          <div class="modal-body">Tem certeza de que deseja remover o aluno?</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
             <button type="button" class="btn btn-danger" id="confirmRemove">Sim</button>
           </div>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
   document.body.insertAdjacentHTML('beforeend', modalHTML);
   const modalConfirm = new bootstrap.Modal(document.getElementById('modalConfirmRemover'));
 
@@ -343,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const urlOri = `/professores/remover-orientando/${encodeURIComponent(alunoSelecionado)}`;
       const resOri = await fetch(urlOri, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
       if (!resOri.ok) {
         const text = await resOri.text();
@@ -365,72 +370,113 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!response.ok) throw new Error('Erro ao carregar bancas');
 
       const bancas = await response.json();
-      const bancasDoUsuario = bancas.filter(banca =>
-        banca.emailAvaliador === email ||
-        banca.emailProfTcc1 === email ||
-        banca.emailOrientador === email
+      const bancasDoUsuario = bancas.filter(
+        (banca) =>
+          banca.emailAvaliador === email ||
+          banca.emailProfTcc1 === email ||
+          banca.emailOrientador === email
       );
 
       for (const banca of bancasDoUsuario) {
-        let alunoNome = banca.emailAluno;
-        try {
-          const resAluno = await fetch(`/alunos/${encodeURIComponent(banca.emailAluno)}`);
-          if (resAluno.ok) {
-            const alunoData = await resAluno.json();
-            if (alunoData.nome) alunoNome = alunoData.nome;
+        if (banca.emailAluno2) {
+          let nome1 = banca.emailAluno1;
+          let nome2 = banca.emailAluno2;
+
+          try {
+            const [r1, r2] = await Promise.all([
+              fetch(`/alunos/${encodeURIComponent(banca.emailAluno1)}`),
+              fetch(`/alunos/${encodeURIComponent(banca.emailAluno2)}`),
+            ]);
+            if (r1.ok) nome1 = (await r1.json()).nome || nome1;
+            if (r2.ok) nome2 = (await r2.json()).nome || nome2;
+          } catch (err) {
+            console.warn('Erro ao buscar nomes dos alunos da dupla:', err);
           }
-        } catch (err) {
-          console.warn('Não foi possível buscar o nome do aluno, usando email.', err);
+
+          const col = document.createElement('div');
+          col.className = 'col';
+          col.style.display = 'block';
+
+          const card = document.createElement('div');
+          card.className = 'card h-100 shadow-sm position-relative';
+
+          const body = document.createElement('div');
+          body.className = 'card-body d-flex flex-column justify-content-between';
+
+          const title = document.createElement('h5');
+          title.className = 'card-title';
+          title.textContent = 'Banca de avaliação';
+
+          const text = document.createElement('p');
+          text.className = 'card-text text-muted';
+          text.textContent = `Acesse informações sobre a banca dos alunos ${nome1} e ${nome2}.`;
+
+          const link = document.createElement('a');
+          link.href = banca.curso === 'BCC' ? './avaliacao-bcc.html' : './avaliacao-sis.html';
+          link.className = 'btn btn-primary mt-3';
+          link.textContent = 'Acessar';
+          link.addEventListener('click', () => {
+            localStorage.setItem('avaliando', banca.emailAluno1);
+            localStorage.setItem('avaliandoParceiro', banca.emailAluno2);
+          });
+
+          body.appendChild(title);
+          body.appendChild(text);
+          body.appendChild(link);
+          card.appendChild(body);
+          col.appendChild(card);
+          secaoBancas.appendChild(col);
+        } else {
+          let nome = banca.emailAluno1;
+          try {
+            const res = await fetch(`/alunos/${encodeURIComponent(banca.emailAluno1)}`);
+            if (res.ok) nome = (await res.json()).nome || nome;
+          } catch (err) {
+            console.warn('Erro ao buscar nome do aluno:', err);
+          }
+
+          const col = document.createElement('div');
+          col.className = 'col';
+          col.style.display = 'block';
+
+          const card = document.createElement('div');
+          card.className = 'card h-100 shadow-sm position-relative';
+
+          const body = document.createElement('div');
+          body.className = 'card-body d-flex flex-column justify-content-between';
+
+          const title = document.createElement('h5');
+          title.className = 'card-title';
+          title.textContent = 'Banca de avaliação';
+
+          const text = document.createElement('p');
+          text.className = 'card-text text-muted';
+          text.textContent = `Acesse informações sobre a banca do aluno ${nome}.`;
+
+          const link = document.createElement('a');
+          link.href = banca.curso === 'BCC' ? './avaliacao-bcc.html' : './avaliacao-sis.html';
+          link.className = 'btn btn-primary mt-3';
+          link.textContent = 'Acessar';
+          link.addEventListener('click', () => {
+            localStorage.setItem('avaliando', banca.emailAluno1);
+            localStorage.removeItem('avaliandoParceiro');
+          });
+
+          body.appendChild(title);
+          body.appendChild(text);
+          body.appendChild(link);
+          card.appendChild(body);
+          col.appendChild(card);
+          secaoBancas.appendChild(col);
         }
-
-        const col = document.createElement('div');
-        col.className = 'col';
-        col.style.display = 'block';
-
-        const card = document.createElement('div');
-        card.className = 'card h-100 shadow-sm position-relative';
-
-        const body = document.createElement('div');
-        body.className = 'card-body d-flex flex-column justify-content-between';
-
-        const title = document.createElement('h5');
-        title.className = 'card-title';
-        title.textContent = 'Banca de avaliação';
-
-        const text = document.createElement('p');
-        text.className = 'card-text text-muted';
-        text.textContent = `Acesse informações sobre a banca do aluno ${alunoNome}.`;
-
-        const link = document.createElement('a');
-        if (banca.curso === 'BCC') {
-          link.href = './avaliacao-bcc.html';
-        }
-        else if (banca.curso === 'SIS') {
-          link.href = './avaliacao-sis.html';
-        }
-       
-        link.className = 'btn btn-primary mt-3';
-        link.textContent = 'Acessar';
-        link.addEventListener('click', () => {
-          localStorage.setItem('avaliando', banca.emailAluno);
-        });
-
-        body.appendChild(title);
-        body.appendChild(text);
-        body.appendChild(link);
-
-        card.appendChild(body);
-        col.appendChild(card);
-        secaoBancas.appendChild(col);
       }
 
       if (!secaoBancas.querySelector('.col')) criarCardPlaceholder(secaoBancas, 'banca');
-
     } catch (err) {
       console.error('Erro ao carregar bancas:', err);
       criarCardPlaceholder(secaoBancas, 'banca');
     }
   }
 
-  await carregarBancas(email);
+  carregarBancas(email);
 });

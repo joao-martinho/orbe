@@ -293,9 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         viewParceiroWrapper.style.display = 'none';
       }
 
-      mensagem.innerHTML = parceiroEmailSelecionado ? 
-        '<div class="alert alert-success">Orientador salvo com sucesso para você e seu parceiro.</div>' :
-        '<div class="alert alert-success">Orientador salvo com sucesso.</div>';
+      mensagem.innerHTML = '<div class="alert alert-success">Orientador atribuído com sucesso.</div>';
       selectOrientador.disabled = true;
       form.querySelector('button[type="submit"]').disabled = true;
       checkCoorientador.disabled = true;
@@ -368,9 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      mensagem.innerHTML = parceiroEmail ? 
-        '<div class="alert alert-success">Orientador removido com sucesso de você e seu parceiro.</div>' :
-        '<div class="alert alert-success">Orientador removido com sucesso.</div>';
+      mensagem.innerHTML = '<div class="alert alert-success">Orientador removido com sucesso.</div>';
       visualizacao.style.display = 'none';
 
       orientadorEmail = null;

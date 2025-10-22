@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnSalvar = document.getElementById('btnSalvar');
 
   const campos = {
-    aluno: document.getElementById('aluno'),
+    aluno1: document.getElementById('aluno1'),
+    aluno2: document.getElementById('aluno2'),
     titulo: document.getElementById('titulo'),
     orientador: document.getElementById('orientador'),
     dataEHora: document.getElementById('dataEHora'),
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!res.ok) throw new Error("Erro ao buscar bancas.");
       const bancas = await res.json();
 
-      banca = bancas.find(b => b.emailAluno === orientandoEmail);
+      banca = bancas.find(b => b.emailAluno1 === orientandoEmail);
       if (!banca) return;
 
       definirPapelUsuario();
@@ -113,7 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function preencherCampos() {
-    campos.aluno.textContent = await getNomeAluno(banca.emailAluno) || "—";
+    campos.aluno1.textContent = await getNomeAluno(banca.emailAluno1) || "—";
+    campos.aluno2.textContent = await getNomeAluno(banca.emailAluno2) || "—";
     campos.titulo.textContent = banca.titulo || "—";
     campos.orientador.textContent = await getNomeProfessor(banca.emailOrientador) || "—";
 

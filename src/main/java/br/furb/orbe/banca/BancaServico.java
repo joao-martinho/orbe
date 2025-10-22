@@ -46,7 +46,8 @@ public class BancaServico {
             BancaModelo existente = optional.get();
 
             if (bancaModelo.getId() != null) existente.setId(bancaModelo.getId());
-            if (bancaModelo.getEmailAluno() != null) existente.setEmailAluno(bancaModelo.getEmailAluno());
+            if (bancaModelo.getEmailAluno1() != null) existente.setEmailAluno1(bancaModelo.getEmailAluno1());
+            if (bancaModelo.getEmailAluno1() != null) existente.setEmailAluno2(bancaModelo.getEmailAluno2());
             if (bancaModelo.getEmailOrientador() != null) existente.setEmailOrientador(bancaModelo.getEmailOrientador());
             if (bancaModelo.getEmailCoorientador() != null) existente.setEmailCoorientador(bancaModelo.getEmailCoorientador());
             if (bancaModelo.getCurso() != null) existente.setCurso(bancaModelo.getCurso());
@@ -103,7 +104,8 @@ public class BancaServico {
     public void criarAPartirDoTermo(TermoModelo termoModelo) {
         BancaModelo bancaModelo = new BancaModelo();
 
-        bancaModelo.setEmailAluno(termoModelo.getEmailAluno());
+        bancaModelo.setEmailAluno1(termoModelo.getEmailAluno());
+        if (termoModelo.getEmailParceiro() != null) { bancaModelo.setEmailAluno2(termoModelo.getEmailParceiro()); }
         bancaModelo.setEmailOrientador(termoModelo.getEmailOrientador());
         bancaModelo.setEmailCoorientador(termoModelo.getEmailCoorientador());
         bancaModelo.setCurso(termoModelo.getCursoAluno());
@@ -123,7 +125,7 @@ public class BancaServico {
     }
 
     public ResponseEntity<BancaModelo> buscarPorAluno(String email) {
-        Optional<BancaModelo> optional = bancaRepositorio.findByEmailAluno(email);
+        Optional<BancaModelo> optional = bancaRepositorio.findByEmailAluno1(email);
         return optional.map(Banca -> new ResponseEntity<>(Banca, HttpStatus.OK))
                        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }

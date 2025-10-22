@@ -12,7 +12,8 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface BancaRepositorio extends JpaRepository<BancaModelo, Long> {
     
-    Optional<BancaModelo> findByEmailAluno(String emailAluno);
+    Optional<BancaModelo> findByEmailAluno1(String emailAluno);
+    Optional<BancaModelo> findByEmailAluno2(String emailAluno);
 
     @Modifying
     @Transactional

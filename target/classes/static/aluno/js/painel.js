@@ -5,27 +5,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '../login.html';
     });
 	
-	verificarAcesso();
+    verificarAcesso();
 
-	async function verificarAcesso() {
-		const tipo = localStorage.getItem('tipo');
-		const emailAluno = localStorage.getItem('email');
+    async function verificarAcesso() {
+        const tipo = localStorage.getItem('tipo');
+        const emailAluno = localStorage.getItem('email');
 
-		if (tipo !== 'aluno' || !emailAluno) {
-			alert('Você não tem permissão para acessar esta página.');
-			window.location.href = '../login.html';
-			return;
-		}
+        if (tipo !== 'aluno' || !emailAluno) {
+            alert('Você não tem permissão para acessar esta página.');
+            window.location.href = '../login.html';
+            return;
+        }
 
-		const res = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
-		if (!res.ok) {
-			alert('Erro ao carregar dados do aluno.');
-			window.location.href = '../login.html';
-			return;
-		}
+        const res = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
+        if (!res.ok) {
+            alert('Erro ao carregar dados do aluno.');
+            window.location.href = '../login.html';
+            return;
+        }
 
-		const aluno = await res.json();
-	}
+        const aluno = await res.json();
+    }
 
     const email = localStorage.getItem('email');
     if (!email) {
@@ -60,6 +60,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             cardRevisao.classList.remove('grayed-out');
             cardAvaliacao.classList.remove('grayed-out');
         }
+
+        cardAvaliacao.addEventListener('click', () => {
+            if (cardAvaliacao.classList.contains('grayed-out')) return;
+
+            if (aluno.curso === 'BCC') {
+                window.location.href = './avaliacao-bcc.html';
+            } else if (aluno.curso === 'SIS') {
+                window.location.href = './avaliacao-sis.html';
+            } else {
+                alert('Curso não reconhecido para redirecionamento.');
+            }
+        });
 
     } catch (error) {
         console.error('Erro ao verificar orientador:', error);

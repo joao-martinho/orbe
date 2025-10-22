@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const emailAluno1 = localStorage.getItem('orientando');
   const emailUsuario = localStorage.getItem('email');
-
   const elEmailAluno1 = document.getElementById('textEmailAluno1');
   const elEmailAluno2 = document.getElementById('textEmailAluno2');
   const emailAluno2Container = document.getElementById('emailAluno2Container');
@@ -111,17 +110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function povoarCampos(t) {
     if (!t) return;
     
-    // Aluno 1 (sempre presente)
     if (elEmailAluno1) elEmailAluno1.textContent = t.emailAluno || '—';
     if (elTelefoneAluno1) elTelefoneAluno1.textContent = t.telefoneAluno || '—';
     
-    // Aluno 2 (parceiro - se existir)
     if (t.emailParceiro && t.nomeParceiro) {
       if (emailAluno2Container) emailAluno2Container.style.display = 'block';
       if (telefoneAluno2Container) telefoneAluno2Container.style.display = 'block';
       if (elEmailAluno2) elEmailAluno2.textContent = t.emailParceiro;
       
-      // Buscar telefone do parceiro
       if (elTelefoneAluno2) {
         try {
           const resParceiro = await fetch(`/alunos/${encodeURIComponent(t.emailParceiro)}`);
