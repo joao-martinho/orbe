@@ -25,20 +25,23 @@ public class OrientacaoServico {
     private final TermoRepositorio termoRepositorio;
 
     public ResponseEntity<AlunoModelo> removerRelacaoProvisoria(String emailAluno) {
-        if (emailAluno == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        if (emailAluno == null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         String emailAlunoNorm = emailAluno.trim().toLowerCase();
         AlunoModelo aluno = alunoRepositorio.findByEmail(emailAlunoNorm);
-        if (aluno == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        AlunoModelo parceiro = null;
+        String emailParceiroNorm = null;
+
+        if (aluno.getParceiro() != null) {
+            parceiro = alunoRepositorio.findByEmail(aluno.getParceiro());
+            if (parceiro != null) emailParceiroNorm = parceiro.getEmail().trim().toLowerCase();
         }
 
         if (aluno.getOrientadorProvisorio() != null) {
             ProfessorModelo orientador = professorRepositorio.findByEmail(aluno.getOrientadorProvisorio().trim().toLowerCase());
             if (orientador != null && orientador.getOrientandosProvisorios() != null) {
                 orientador.getOrientandosProvisorios().remove(emailAlunoNorm);
+                if (emailParceiroNorm != null) orientador.getOrientandosProvisorios().remove(emailParceiroNorm);
                 professorRepositorio.save(orientador);
             }
         }
@@ -57,8 +60,13 @@ public class OrientacaoServico {
         alunoRepositorio.save(aluno);
 
         TermoModelo termoModelo = termoRepositorio.findByEmailAluno(emailAlunoNorm);
-        if (termoModelo != null) {
-            removerTermo(termoModelo.getId());
+        if (termoModelo != null) removerTermo(termoModelo.getId());
+
+        if (parceiro != null) {
+            parceiro.setOrientadorProvisorio(null);
+            parceiro.setCoorientadorProvisorio(null);
+            parceiro.setParceiro(null);
+            alunoRepositorio.save(parceiro);
         }
 
         return new ResponseEntity<>(aluno, HttpStatus.OK);
@@ -76,9 +84,7 @@ public class OrientacaoServico {
         ProfessorModelo professor = professorRepositorio.findByEmail(emailProfessor);
         AlunoModelo aluno = alunoRepositorio.findByEmail(emailAluno);
 
-        if (professor == null || aluno == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        if (professor == null || aluno == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         List<String> listaProvisorios = orientador ? professor.getOrientandosProvisorios() : professor.getCoorientandosProvisorios();
         if (listaProvisorios == null) listaProvisorios = new ArrayList<>();
@@ -94,47 +100,59 @@ public class OrientacaoServico {
         else aluno.setCoorientadorProvisorio(emailProfessor);
 
         alunoRepositorio.save(aluno);
-
         return new ResponseEntity<>(aluno, HttpStatus.OK);
     }
 
     public void aprovarTermo(TermoModelo termoModelo) {
         AlunoModelo aluno = alunoRepositorio.findByEmail(termoModelo.getEmailAluno());
-        AlunoModelo parceiro = alunoRepositorio.findByEmail(termoModelo.getEmailParceiro());
+        AlunoModelo parceiro = termoModelo.getEmailParceiro() != null ? alunoRepositorio.findByEmail(termoModelo.getEmailParceiro()) : null;
         boolean coorientadorExiste = termoModelo.getEmailCoorientador() != null;
 
+        // Definir status final
         if ("devolvido".equals(termoModelo.getStatusOrientador()) ||
             "devolvido".equals(termoModelo.getStatusCoorientador()) ||
             "devolvido".equals(termoModelo.getStatusProfessorTcc1())) {
             termoModelo.setStatusFinal("devolvido");
         } else if ("aprovado".equals(termoModelo.getStatusProfessorTcc1())) {
             termoModelo.setStatusFinal("aprovado");
-        } else if (coorientadorExiste && "aprovado".equals(termoModelo.getStatusCoorientador())) {
-            termoModelo.setStatusFinal("pendente");
-        } else if (!coorientadorExiste && "aprovado".equals(termoModelo.getStatusOrientador())) {
-            termoModelo.setStatusFinal("pendente");
         } else {
             termoModelo.setStatusFinal("pendente");
         }
 
         if ("aprovado".equals(termoModelo.getStatusFinal())) {
-            aluno.setOrientador(termoModelo.getEmailOrientador());
-            parceiro.setOrientador(termoModelo.getEmailOrientador());
+            if (aluno != null) aluno.setOrientador(termoModelo.getEmailOrientador());
+            if (parceiro != null) parceiro.setOrientador(termoModelo.getEmailOrientador());
+
             if (coorientadorExiste) {
-                aluno.setCoorientador(termoModelo.getEmailCoorientador());
-                this.alterarAlunoParcial(aluno.getEmail(), aluno);
-                parceiro.setCoorientador(termoModelo.getEmailCoorientador());
-                this.alterarAlunoParcial(parceiro.getEmail(), parceiro);
+                if (aluno != null) {
+                    aluno.setCoorientador(termoModelo.getEmailCoorientador());
+                    this.alterarAlunoParcial(aluno.getEmail(), aluno);
+                }
+                if (parceiro != null) {
+                    parceiro.setCoorientador(termoModelo.getEmailCoorientador());
+                    this.alterarAlunoParcial(parceiro.getEmail(), parceiro);
+                }
+            } else {
+                if (aluno != null) this.alterarAlunoParcial(aluno.getEmail(), aluno);
+                if (parceiro != null) this.alterarAlunoParcial(parceiro.getEmail(), parceiro);
             }
 
-            ProfessorModelo orientador = professorRepositorio.findByEmail(termoModelo.getEmailOrientador());
-            orientador.getOrientandos().add(aluno.getEmail());
-            this.alterarProfessorParcial(orientador.getEmail(), orientador);
+            // Atualiza orientador
+            if (aluno != null) {
+                ProfessorModelo orientador = professorRepositorio.findByEmail(termoModelo.getEmailOrientador());
+                if (orientador != null) {
+                    orientador.getOrientandos().add(aluno.getEmail());
+                    this.alterarProfessorParcial(orientador.getEmail(), orientador);
+                }
+            }
 
-            if (coorientadorExiste) {
+            // Atualiza coorientador
+            if (coorientadorExiste && aluno != null) {
                 ProfessorModelo coorientador = professorRepositorio.findByEmail(termoModelo.getEmailCoorientador());
-                coorientador.getCoorientandos().add(aluno.getEmail());
-                this.alterarProfessorParcial(coorientador.getEmail(), coorientador);
+                if (coorientador != null) {
+                    coorientador.getCoorientandos().add(aluno.getEmail());
+                    this.alterarProfessorParcial(coorientador.getEmail(), coorientador);
+                }
             }
         }
     }

@@ -340,6 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('confirmRemove').addEventListener('click', async () => {
     modalConfirm.hide();
     if (!alunoSelecionado || !colSelecionado) return;
+    const emailParceiro = alunoSelecionado.parceiro;
 
     try {
       const urlOri = `/professores/remover-orientando/${encodeURIComponent(alunoSelecionado)}`;

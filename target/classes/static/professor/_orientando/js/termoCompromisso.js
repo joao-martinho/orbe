@@ -121,12 +121,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (elEmailAluno1) elEmailAluno1.textContent = t.emailAluno || '—';
     if (elTelefoneAluno1) elTelefoneAluno1.textContent = t.telefoneAluno || '—';
 
-    if (t.emailParceiro && t.nomeParceiro) {
-      emailAluno2Container.style.display = 'block';
-      telefoneAluno2Container.style.display = 'block';
-      elEmailAluno2.textContent = t.emailParceiro;
+    emailAluno2Container.style.display = 'block';
+    telefoneAluno2Container.style.display = 'block';
+    elEmailAluno2.textContent = t.emailParceiro || '—';
 
-      try {
+    try {
+      if (t.emailParceiro) {
         const resParceiro = await fetch(`/alunos/${encodeURIComponent(t.emailParceiro)}`);
         if (resParceiro.ok) {
           const dadosParceiro = await resParceiro.json();
@@ -134,12 +134,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
           elTelefoneAluno2.textContent = '—';
         }
-      } catch {
+      } else {
         elTelefoneAluno2.textContent = '—';
       }
-    } else {
-      emailAluno2Container.style.display = 'none';
-      telefoneAluno2Container.style.display = 'none';
+    } catch {
+      elTelefoneAluno2.textContent = '—';
     }
 
     elCurso.textContent = t.cursoAluno || '—';

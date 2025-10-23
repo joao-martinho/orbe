@@ -23,8 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = '../login.html';
             return;
         }
-
-        const aluno = await res.json();
     }
 
     const email = localStorage.getItem('email');

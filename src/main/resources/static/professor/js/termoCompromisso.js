@@ -111,14 +111,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('modalResumo').textContent = termo.resumo;
     document.getElementById('modalPerfilCoorientador').textContent = termo.perfilCoorientador || '—';
 
-    // Mostrar parceiro se existir
     const modalParceiroContainer = document.getElementById('modalParceiroContainer');
-    if (termo.nomeParceiro) {
-      modalParceiroContainer.style.display = 'block';
-      document.getElementById('modalNomeParceiro').textContent = termo.nomeParceiro;
-    } else {
-      modalParceiroContainer.style.display = 'none';
-    }
+    modalParceiroContainer.style.display = 'block';
+    document.getElementById('modalNomeParceiro').textContent = termo.nomeParceiro || '—';
 
     const orientadorNome = await buscarNomeProfessor(termo.emailOrientador);
     const coorientadorNome = termo.emailCoorientador

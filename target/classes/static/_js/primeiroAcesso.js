@@ -10,9 +10,8 @@ const formPrimeiroAcesso = document.getElementById('formPrimeiroAcesso');
 function mostrarMensagem(texto, tipo = 'danger') {
     const mensagemDiv = document.getElementById('mensagem');
     mensagemDiv.innerHTML = `
-        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+        <div class="alert alert-${tipo}">
             ${texto}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
         </div>
     `;
 }
