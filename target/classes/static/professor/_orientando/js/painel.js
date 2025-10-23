@@ -10,53 +10,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function verificarAcesso() {
         const tipo = localStorage.getItem('tipo');
         const emailProfessor = localStorage.getItem('email');
-        const emailAluno = localStorage.getItem('orientando');
+        const emailAluno1 = localStorage.getItem('orientando');
+        const emailAluno2 = localStorage.getItem('parceiro');
 
-        if (tipo !== 'professor' || !emailProfessor || !emailAluno) {
-            alert('Você não tem permissão para acessar esta página.');
+        if (tipo !== 'professor' || !emailProfessor || !emailAluno1) {
+            alert('Você não tem permissão para acessar esta página :(');
             window.location.href = '../../login.html';
             return;
         }
 
         try {
-            const resAluno = await fetch(`/alunos/${encodeURIComponent(emailAluno)}`);
-            if (!resAluno.ok) {
-                alert('Erro ao carregar dados do orientando.');
-                window.location.href = '../../login.html';
-                return;
+            const res1 = await fetch(`/alunos/${encodeURIComponent(emailAluno1)}`);
+            if (!res1.ok) throw new Error('Erro ao buscar dados do primeiro aluno.');
+            const aluno1 = await res1.json();
+
+            let aluno2 = null;
+            if (emailAluno2) {
+                try {
+                    const res2 = await fetch(`/alunos/${encodeURIComponent(emailAluno2)}`);
+                    if (res2.ok) aluno2 = await res2.json();
+                } catch {
+                    console.warn('Não foi possível carregar dados do segundo aluno.');
+                }
             }
 
-            const aluno = await resAluno.json();
-            atualizarInterface(aluno);
+            atualizarInterface(aluno1, aluno2);
 
         } catch (erro) {
-            console.error('Erro ao buscar dados do aluno:', erro);
-            alert('Erro de conexão ao carregar dados do aluno.');
+            console.error('Erro ao buscar dados do(s) aluno(s):', erro);
             window.location.href = '../../login.html';
         }
     }
 
-    function atualizarInterface(aluno) {
+    function atualizarInterface(aluno1, aluno2) {
         const h1 = document.getElementById('titulo-aluno');
         if (h1) {
-            h1.textContent = `Orientando: ${aluno.nome || '(não identificado)'}`;
+            if (aluno2) {
+                const nome1 = aluno1.nome || '(não identificado)';
+                const nome2 = aluno2.nome || '(não identificado)';
+                h1.textContent = `Orientandos: ${nome1} e ${nome2}`;
+            } else {
+                h1.textContent = `Orientando: ${aluno1.nome || '(não identificado)'}`;
+            }
             h1.style.display = 'block';
         }
 
-        // Seleciona todos os cards exceto o “Termo de compromisso”
         const cards = Array.from(document.querySelectorAll('.col'))
             .filter(card => card.querySelector('.card-title').textContent !== 'Termo de compromisso');
 
-        if (!aluno.orientador && !aluno.orientadorProvisorio) {
+        const alunoRef = aluno2 ? aluno1 : aluno1;
+
+        if (!alunoRef.orientador && !alunoRef.orientadorProvisorio) {
             cards.forEach(card => card.classList.add('grayed-out'));
-        } else if (!aluno.orientador && aluno.orientadorProvisorio) {
-            // Apenas Termo ativo, o resto bloqueado
+        } else if (!alunoRef.orientador && alunoRef.orientadorProvisorio) {
             cards.forEach(card => card.classList.add('grayed-out'));
-        } else if (aluno.orientador) {
+        } else if (alunoRef.orientador) {
             cards.forEach(card => card.classList.remove('grayed-out'));
         }
 
-        // Controle de coorientando
         const isCoorientando = localStorage.getItem('isCoorientando') === 'true';
         if (isCoorientando) {
             const cardEnvio = document.querySelector('[data-role="envio-documentos"]');
@@ -65,7 +76,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (cardRecebimento) cardRecebimento.style.display = 'none';
         }
 
-        // Controle por papéis ativos
         const papeisAtivos = [];
         ['coordTcc1', 'coordBcc', 'coordSis'].forEach(papel => {
             if (localStorage.getItem(papel) === 'true') {

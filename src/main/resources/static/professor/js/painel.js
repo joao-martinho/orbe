@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     secao.appendChild(col);
   }
 
-  // ---- Exibição das funções ----
   secaoFuncoes.querySelectorAll('.col[data-role]').forEach((col) => {
     const role = col.dataset.role;
     if (localStorage.getItem(role) === 'true') {
@@ -112,8 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   ) {
     criarCardPlaceholder(secaoFuncoes, 'funcoes');
   }
-
-  // ---- Criação de cards de orientandos ----
 
   function criarCardAluno(aluno, tipoOrientacao = 'Orientando', isProvisorio = false) {
     if (emailsProcessados.has(aluno.email)) return;
@@ -206,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     link.textContent = 'Acessar';
     link.addEventListener('click', () => {
       localStorage.setItem('orientando', aluno.email);
-      localStorage.setItem('orientandoParceiro', aluno.parceiro);
+      localStorage.setItem('parceiro', aluno.parceiro);
       if (tipoOrientacao.includes('Coorientando')) {
         localStorage.setItem('isCoorientando', 'true');
       } else {

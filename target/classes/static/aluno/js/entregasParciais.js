@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function () {
       window.location.href = '../login.html';
       return;
     }
+
+    // guarda o aluno carregado pra uso posterior
+    carregarEntregas(aluno);
   }
 
   const tabela = document.querySelector('#tabelaEntregas tbody');
@@ -61,47 +64,54 @@ document.addEventListener('DOMContentLoaded', function () {
     return `${dia}/${mes}/${ano}, ${horas}:${minutos}`;
   }
 
-  function carregarEntregas() {
-    if (!email) return;
+  async function carregarEntregas(aluno) {
+    if (!aluno?.email) return;
 
-    fetch(`/entregas/aluno/${email}`)
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao buscar entregas.');
-        return response.json();
-      })
-      .then(data => {
-        tabela.innerHTML = '';
+    const emailsParaBuscar = [aluno.email];
+    if (aluno.parceiro) emailsParaBuscar.push(aluno.parceiro);
 
-        if (!data.length) {
-          const placeholder = tabela.insertRow();
-          placeholder.innerHTML = `
-            <td colspan="3" style="text-align:center; color:gray;">Você ainda não enviou nenhuma entrega parcial.</td>
-          `;
-          return;
-        }
+    try {
+      const resultados = await Promise.all(
+        emailsParaBuscar.map(e =>
+          fetch(`/entregas/aluno/${encodeURIComponent(e)}`).then(r => {
+            if (!r.ok) throw new Error('Erro ao buscar entregas.');
+            return r.json();
+          })
+        )
+      );
 
-        data
-          .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
-          .forEach(entrega => {
-            const fileira = tabela.insertRow();
-            fileira.innerHTML = `
-              <td>${entrega.titulo}</td>
-              <td>${formatarData(entrega.criadoEm)}</td>
-              <td><a href="/entregas/${entrega.id}/download" class="btn btn-sm btn-primary">Baixar</a></td>
-            `;
-          });
-      })
-      .catch(erro => {
-        console.error('Erro ao carregar entregas: ', erro);
-        tabela.innerHTML = '';
+      const entregas = resultados.flat();
+      tabela.innerHTML = '';
+
+      if (!entregas.length) {
         const placeholder = tabela.insertRow();
         placeholder.innerHTML = `
-          <td colspan="3" style="text-align:center; color:gray;">Você ainda não enviou nenhuma entrega parcial.</td>
-        `;
-      });
-  }
+          <td colspan="3" style="text-align:center; color:gray;">
+            Nenhuma entrega encontrada.
+          </td>`;
+        return;
+      }
 
-  carregarEntregas();
+      entregas
+        .sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm))
+        .forEach(entrega => {
+          const fileira = tabela.insertRow();
+          fileira.innerHTML = `
+            <td>${entrega.titulo}</td>
+            <td>${formatarData(entrega.criadoEm)}</td>
+            <td><a href="/entregas/${entrega.id}/download" class="btn btn-sm btn-primary">Baixar</a></td>
+          `;
+        });
+    } catch (erro) {
+      console.error('Erro ao carregar entregas:', erro);
+      tabela.innerHTML = '';
+      const placeholder = tabela.insertRow();
+      placeholder.innerHTML = `
+        <td colspan="3" style="text-align:center; color:gray;">
+          Erro ao carregar entregas.
+        </td>`;
+    }
+  }
 
   formularioEntrega.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -136,7 +146,8 @@ document.addEventListener('DOMContentLoaded', function () {
           return res.json();
         })
         .then(() => {
-          carregarEntregas();
+          // recarrega com base no aluno atual
+          verificarAcesso();
           form.reset();
           form.classList.remove('was-validated');
         })
