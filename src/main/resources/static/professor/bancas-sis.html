@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="../_favicon.ico">
+  <title>Controle de bancas - Orbe</title>
+  <style>
+    #modalApresentacao .modal-body {
+      max-height: 60vh; 
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="painel.html" class="btn btn-secondary">← Voltar ao painel</a>
+    <button id="btnSair" class="btn btn-danger">Sair</button>
+  </div>
+  
+  <h1 class="mb-4 text-center">Controle de bancas</h1>
+
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered table-striped align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col">Aluno 1</th>
+          <th scope="col">Aluno 2</th>
+          <th scope="col">Título</th>
+          <th scope="col">Orientador</th>
+          <th scope="col">Coorientador</th>
+          <th scope="col">Situação</th>
+          <th scope="col">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="listaTermos"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="modalApresentacao" tabindex="-1" aria-labelledby="modalApresentacaoLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <form id="formApresentacao" class="needs-validation" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalApresentacaoLabel">Configurar apresentação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Aluno 1:</strong> <span id="modalNomeAluno1"></span></p>
+          <p><strong>Aluno 2:</strong> <span id="modalNomeAluno2"></span></p>
+          <p><strong>Orientador:</strong> <span id="modalNomeOrientador"></span></p>
+          <p><strong>Coorientador:</strong> <span id="modalNomeCoorientador"></span></p>
+          <p><strong>Título do trabalho:</strong> <span id="modalTitulo"></span></p>
+          <p><strong>Resumo do problema:</strong></p>
+          <p id="modalResumo"></p>
+
+          <div class="mb-3">
+            <label for="avaliador" class="form-label">Avaliador</label>
+            <select id="avaliador" name="avaliador" class="form-select" required>
+              <option value="" selected disabled>Escolha o avaliador</option>
+            </select>
+            <div class="invalid-feedback">Campo obrigatório.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="dataApresentacao" class="form-label">Data da apresentação</label>
+            <input type="date" id="dataApresentacao" name="dataApresentacao" class="form-control" required>
+            <div class="invalid-feedback">Campo obrigatório.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="horaApresentacao" class="form-label">Hora da apresentação</label>
+            <input type="time" id="horaApresentacao" name="horaApresentacao" class="form-control" required>
+            <div class="invalid-feedback">Campo obrigatório.</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" id="btnSalvar">Salvar configuração</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/bancasSis.js"></script>
+</body>
+</html>

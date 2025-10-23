@@ -5,8 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   tipo !== 'professor' ||
   !emailUsuario ||
   (
-    localStorage.getItem('coord_bcc') !== 'true' &&
-    localStorage.getItem('prof_tcc2') !== 'true'
+    localStorage.getItem('coord_bcc') !== 'true'
   )
 ) {
     alert('Você não tem permissão para acessar esta página :(');
@@ -33,7 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let alunosCache = {};
   let todosProfessores = [];
   let termoAtual = null;
-  let papeisUsuario = [];
 
   async function carregarUsuarioAtual() {
     try {
@@ -51,23 +49,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const res = await fetch('/bancas');
       todasBancas = await res.json();
 
-      filtrarBancasPorPapel();
+      termos = [];
+      termos = termos.concat(todasBancas.filter(banca => banca.curso === 'BCC'));
 
       await popularNomes(termos);
       renderizarTabela();
     } catch {
       console.log('Erro ao carregar as bancas.');
-    }
-  }
-
-  function filtrarBancasPorPapel() {
-    termos = [];
-
-    if (papeisUsuario.includes('PROF_TCC2')) {
-      termos = todasBancas.filter(banca => banca.curso === 'SIS');
-    } 
-    if (papeisUsuario.includes('COORD_BCC')) {
-      termos = termos.concat(todasBancas.filter(banca => banca.curso === 'BCC'));
     }
   }
 
@@ -99,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function popularNomes(termos) {
     for (const t of termos) {
-      t.nomeAluno = await getNomeAluno(t.emailAluno);
+      t.nomeAluno1 = await getNomeAluno(t.emailAluno1);
       t.nomeOrientador = await getNomeProfessor(t.emailOrientador);
       t.nomeCoorientador = t.emailCoorientador ? await getNomeProfessor(t.emailCoorientador) : '—';
       t.nomeAvaliador = t.emailAvaliador ? await getNomeProfessor(t.emailAvaliador) : '—';
@@ -123,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       .forEach(termo => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${termo.nomeAluno}</td>
+          <td>${termo.nomeAluno1}</td>
           <td>${termo.titulo}</td>
           <td>${termo.nomeOrientador}</td>
           <td>${termo.nomeCoorientador}</td>
@@ -163,7 +151,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function abrirModal(termo) {
     termoAtual = termo;
-    document.getElementById('modalNomeAluno').textContent = termo.nomeAluno;
+    document.getElementById('modalNomeAluno').textContent = termo.nomeAluno1;
     document.getElementById('modalTitulo').textContent = termo.titulo;
     document.getElementById('modalResumo').textContent = termo.resumo;
 
@@ -209,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!termoAtual) return;
 
     const payload = {
-      emailAluno: termoAtual.emailAluno,
+      emailAluno1: termoAtual.emailAluno1,
       emailOrientador: termoAtual.emailOrientador,
       curso: termoAtual.curso,
       titulo: termoAtual.titulo,
