@@ -30,6 +30,21 @@
       <div class="invalid-feedback">Campo obrigatório.</div>
     </div>
 
+    <div class="form-check mb-3" id="parceiroCheckContainer" style="display:none;">
+      <input class="form-check-input" type="checkbox" id="checkParceiro">
+      <label class="form-check-label" for="checkParceiro">
+        Adicionar parceiro
+      </label>
+    </div>
+
+    <div class="mb-3" id="parceiroContainer" style="display:none;">
+      <label for="parceiro" class="form-label">Parceiro</label>
+      <select class="form-select" id="parceiro">
+        <option value="">Escolha o seu parceiro</option>
+      </select>
+      <div class="invalid-feedback">Campo obrigatório.</div>
+    </div>
+
     <div class="form-check mb-3">
       <input class="form-check-input" type="checkbox" id="checkCoorientador">
       <label class="form-check-label" for="checkCoorientador">
@@ -56,6 +71,9 @@
     <p id="viewCoorientadorWrapper" style="display:none;">
       <strong>Coorientador provisório:</strong> <span id="viewCoorientador"></span>
     </p>
+    <p id="viewParceiroWrapper" style="display:none;">
+      <strong>Parceiro:</strong> <span id="viewParceiro"></span>
+    </p>
 
     <div class="mt-3">
       <button id="btnRemoverOrientador" class="btn btn-danger">Remover</button>
@@ -67,9 +85,15 @@
 <script>
   const checkCoorientador = document.getElementById('checkCoorientador');
   const coorientadorContainer = document.getElementById('coorientadorContainer');
+  const checkParceiro = document.getElementById('checkParceiro');
+  const parceiroContainer = document.getElementById('parceiroContainer');
 
   checkCoorientador.addEventListener('change', () => {
     coorientadorContainer.style.display = checkCoorientador.checked ? 'block' : 'none';
+  });
+
+  checkParceiro.addEventListener('change', () => {
+    parceiroContainer.style.display = checkParceiro.checked ? 'block' : 'none';
   });
 </script>
 <script src="js/orientadorProvisorio.js"></script>

@@ -53,6 +53,7 @@ public class OrientacaoServico {
 
         aluno.setOrientadorProvisorio(null);
         aluno.setCoorientadorProvisorio(null);
+        aluno.setParceiro(null);
         alunoRepositorio.save(aluno);
 
         TermoModelo termoModelo = termoRepositorio.findByEmailAluno(emailAlunoNorm);
@@ -99,6 +100,7 @@ public class OrientacaoServico {
 
     public void aprovarTermo(TermoModelo termoModelo) {
         AlunoModelo aluno = alunoRepositorio.findByEmail(termoModelo.getEmailAluno());
+        AlunoModelo parceiro = alunoRepositorio.findByEmail(termoModelo.getEmailParceiro());
         boolean coorientadorExiste = termoModelo.getEmailCoorientador() != null;
 
         if ("devolvido".equals(termoModelo.getStatusOrientador()) ||
@@ -117,8 +119,13 @@ public class OrientacaoServico {
 
         if ("aprovado".equals(termoModelo.getStatusFinal())) {
             aluno.setOrientador(termoModelo.getEmailOrientador());
-            if (coorientadorExiste) aluno.setCoorientador(termoModelo.getEmailCoorientador());
-            this.alterarAlunoParcial(aluno.getEmail(), aluno);
+            parceiro.setOrientador(termoModelo.getEmailOrientador());
+            if (coorientadorExiste) {
+                aluno.setCoorientador(termoModelo.getEmailCoorientador());
+                this.alterarAlunoParcial(aluno.getEmail(), aluno);
+                parceiro.setCoorientador(termoModelo.getEmailCoorientador());
+                this.alterarAlunoParcial(parceiro.getEmail(), parceiro);
+            }
 
             ProfessorModelo orientador = professorRepositorio.findByEmail(termoModelo.getEmailOrientador());
             orientador.getOrientandos().add(aluno.getEmail());

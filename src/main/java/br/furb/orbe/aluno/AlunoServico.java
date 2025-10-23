@@ -55,6 +55,7 @@ public class AlunoServico {
             if (alunoModelo.getSenha() != null) existente.setSenhaEmTexto(alunoModelo.getSenha());
             if (alunoModelo.getOrientadorProvisorio() != null) orientacaoServico.atribuirOrientadorProvisorio(email, alunoModelo.getOrientadorProvisorio());
             if (alunoModelo.getCoorientadorProvisorio() != null) orientacaoServico.atribuirCoorientadorProvisorio(email, alunoModelo.getCoorientadorProvisorio());
+            if (alunoModelo.getParceiro() != null) atribuirParceiro(email, alunoModelo.getParceiro());
 
             return new ResponseEntity<>(alunoRepositorio.save(existente), HttpStatus.OK);
         }
@@ -87,5 +88,54 @@ public class AlunoServico {
 
     public ResponseEntity<AlunoModelo> removerOrientadorProvisorio(String emailAluno) {
         return orientacaoServico.removerRelacaoProvisoria(emailAluno);
+    }
+
+    public ResponseEntity<AlunoModelo> atribuirParceiro(String emailAluno, String emailParceiro) {
+        Optional<AlunoModelo> optionalAluno = alunoRepositorio.findById(emailAluno);
+        Optional<AlunoModelo> optionalParceiro = alunoRepositorio.findById(emailParceiro);
+
+        if (!optionalAluno.isPresent() || !optionalParceiro.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        AlunoModelo aluno = optionalAluno.get();
+        AlunoModelo parceiro = optionalParceiro.get();
+
+        if (!"SIS".equals(parceiro.getCurso())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        aluno.setParceiro(parceiro.getEmail());
+        parceiro.setParceiro(aluno.getEmail());
+
+        alunoRepositorio.save(aluno);
+        alunoRepositorio.save(parceiro);
+
+        return new ResponseEntity<>(aluno, HttpStatus.OK);
+    }
+
+    public ResponseEntity<AlunoModelo> removerParceiro(String emailAluno) {
+        Optional<AlunoModelo> optionalAluno = alunoRepositorio.findById(emailAluno);
+        
+        if (!optionalAluno.isPresent()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        AlunoModelo aluno = optionalAluno.get();
+        String emailParceiro = aluno.getParceiro();
+        
+        if (emailParceiro != null) {
+            Optional<AlunoModelo> optionalParceiro = alunoRepositorio.findById(emailParceiro);
+            if (optionalParceiro.isPresent()) {
+                AlunoModelo parceiro = optionalParceiro.get();
+                parceiro.setParceiro(null);
+                alunoRepositorio.save(parceiro);
+            }
+        }
+        
+        aluno.setParceiro(null);
+        alunoRepositorio.save(aluno);
+        
+        return new ResponseEntity<>(aluno, HttpStatus.OK);
     }
 }

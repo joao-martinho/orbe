@@ -43,6 +43,11 @@ public class TermoModelo {
     @Email
     private String emailCoorientador;
 
+    @Email
+    private String emailParceiro;
+
+    private String nomeParceiro;
+
     @Lob
     private String perfilCoorientador;
 

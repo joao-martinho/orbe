@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const tipo = localStorage.getItem('tipo');
 	const emailProfessor = localStorage.getItem('email');
-	if (tipo !== 'professor' || !localStorage.getItem('orientando') || !emailProfessor) {
+	if (tipo !== 'professor' || !emailProfessor) {
 		alert('Você não tem permissão para acessar esta página :(');
 		window.location.href = '../../login.html';
 	}

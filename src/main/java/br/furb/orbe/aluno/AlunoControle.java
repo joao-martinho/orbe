@@ -54,6 +54,16 @@ public class AlunoControle {
         return this.alunoServico.removerOrientadorProvisorio(email);
     }
 
+    @PatchMapping("/atribuir-parceiro/{emailAluno}/{emailParceiro}")
+    public ResponseEntity<AlunoModelo> atribuirParceiro(@PathVariable String emailAluno, @PathVariable String emailParceiro) {
+        return this.alunoServico.atribuirParceiro(emailAluno, emailParceiro);
+    }
+
+    @PatchMapping("/remover-parceiro/{email}")
+    public ResponseEntity<AlunoModelo> removerParceiro(@PathVariable String email) {
+        return this.alunoServico.removerParceiro(email);
+    }
+
     @DeleteMapping("/{email}")
     public ResponseEntity<Void> removerAluno(@PathVariable String email) {
         return this.alunoServico.removerAluno(email);

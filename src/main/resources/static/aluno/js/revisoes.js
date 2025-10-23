@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
 	const btnSair = document.getElementById('btnSair');
-    btnSair?.addEventListener('click', () => {
-        localStorage.clear();
-        window.location.href = '../login.html';
-    });
+	btnSair?.addEventListener('click', () => {
+		localStorage.clear();
+		window.location.href = '../login.html';
+	});
 	
 	verificarAcesso();
 
@@ -31,10 +31,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			window.location.href = '../login.html';
 			return;
 		}
+
+		
+		
+		carregarEntregas(aluno);
 	}
 
 	const tabela = document.getElementById('tabelaEntregas').getElementsByTagName('tbody')[0];
-	const email = localStorage.getItem('email');
 
 	function formatarData(isoString) {
 		const data = new Date(isoString);
@@ -46,17 +49,26 @@ document.addEventListener('DOMContentLoaded', function () {
 		return `${dia}/${mes}/${ano}, ${horas}:${minutos}`;
 	}
 
-	async function carregarEntregas() {
-		if (!email) return;
+	async function carregarEntregas(aluno) {
+		if (!aluno?.email) return;
+
+		const emailsParaBuscar = [aluno.email];
+		if (aluno.parceiro) emailsParaBuscar.push(aluno.parceiro);
 
 		try {
-			const resp = await fetch(`/revisoes/aluno/${email}`);
-			if (!resp.ok) throw new Error('Erro ao buscar revisões.');
-			const data = await resp.json();
+			const resultados = await Promise.all(
+				emailsParaBuscar.map(e =>
+					fetch(`/revisoes/aluno/${encodeURIComponent(e)}`).then(r => {
+						if (!r.ok) throw new Error('Erro ao buscar revisões.');
+						return r.json();
+					})
+				)
+			);
 
+			const revisoes = resultados.flat();
 			tabela.innerHTML = '';
 
-			if (!data.length) {
+			if (!revisoes.length) {
 				const placeholder = tabela.insertRow();
 				placeholder.innerHTML = `
 					<td colspan="4" style="text-align:center; color:gray;">Você ainda não recebeu nenhuma revisão.</td>
@@ -64,9 +76,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			data.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
+			revisoes.sort((a, b) => new Date(b.criadoEm) - new Date(a.criadoEm));
 
-			const professoresPromises = data.map(entrega =>
+			const professoresPromises = revisoes.map(entrega =>
 				fetch(`/professores/${entrega.emailAutor}`)
 					.then(r => {
 						if (!r.ok) throw new Error(`Erro ao buscar professor ${entrega.emailAutor}`);
@@ -78,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			const nomesProfessores = await Promise.all(professoresPromises);
 
-			data.forEach((entrega, idx) => {
+			revisoes.forEach((entrega, idx) => {
 				const fileira = tabela.insertRow();
 				fileira.innerHTML = `
 					<td>${entrega.titulo}</td>
@@ -88,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				`;
 			});
 		} catch (erro) {
-			console.error('Erro ao carregar revisões: ', erro);
+			console.error('Erro ao carregar revisões:', erro);
 			tabela.innerHTML = '';
 			const placeholder = tabela.insertRow();
 			placeholder.innerHTML = `
@@ -96,6 +108,4 @@ document.addEventListener('DOMContentLoaded', function () {
 			`;
 		}
 	}
-
-	carregarEntregas();
 });

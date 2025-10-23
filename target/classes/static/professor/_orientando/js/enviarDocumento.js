@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
           return res.json();
         })
         .then(() => {
-          mensagem.textContent = 'Documento enviado com sucesso!';
-          mensagem.className = 'mb-3 text-center fw-bold text-success';
+          mensagem.textContent = 'Documento enviado com sucesso.';
+          mensagem.className = 'alert alert-success';
           formularioEntrega.reset();
           [inputTitulo, inputArquivo].forEach(c => c.classList.remove('is-valid'));
           carregarEntregas();
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(err => {
           console.error(err);
           mensagem.textContent = 'Erro ao enviar documento.';
-          mensagem.className = 'mb-3 text-center fw-bold text-danger';
+          mensagem.className = 'alert alert-danger';
         });
     };
 

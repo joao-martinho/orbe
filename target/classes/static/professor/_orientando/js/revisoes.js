@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const tipo = localStorage.getItem('tipo');
 	const email = localStorage.getItem('email');
-	if (tipo !== 'professor' || !localStorage.getItem('orientando') || !email) {
+	if (tipo !== 'professor' || !email) {
 		alert('Você não tem permissão para acessar esta página :(');
 		window.location.href = '../../login.html';
 	}
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     } catch (e) {
       mensagem.textContent = e.message;
-      mensagem.className = 'text-center text-danger mb-3';
+      mensagem.className = 'alert alert-danger';
     }
   }
 
@@ -114,14 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!resp.ok) throw new Error('Erro ao enviar revisão.');
 
       mensagem.textContent = 'Revisão enviada com sucesso!';
-      mensagem.className = 'text-center text-success mb-3';
+      mensagem.className = 'alert alert-success';
 
       form.reset();
       [inputTitulo, inputArquivo].forEach(c => c.classList.remove('is-valid'));
       carregarEntregas();
     } catch (e) {
       mensagem.textContent = e.message;
-      mensagem.className = 'text-center text-danger mb-3';
+      mensagem.className = 'alert alert-danger';
     }
   });
 

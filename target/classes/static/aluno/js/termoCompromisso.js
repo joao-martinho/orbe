@@ -49,10 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const perfilContainer = document.getElementById('perfilContainer');
 
   const termoInfo = {
+    termoAluno: document.getElementById('termoAluno'),
     termoTitulo: document.getElementById('termoTitulo'),
     termoOrientador: document.getElementById('termoOrientador'),
     termoCoorientadorContainer: document.getElementById('termoCoorientadorContainer'),
     termoCoorientador: document.getElementById('termoCoorientador'),
+    termoParceiroContainer: document.getElementById('termoParceiroContainer'),
+    termoParceiro: document.getElementById('termoParceiro'),
     termoPerfilCoorientadorContainer: document.getElementById('termoPerfilCoorientadorContainer'),
     termoPerfilCoorientador: document.getElementById('termoPerfilCoorientador'),
     termoAnoSemestre: document.getElementById('termoAnoSemestre'),
@@ -81,7 +84,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function buscarNomeAluno(email) {
+    if (!email) return '—';
+    try {
+      const res = await fetch(`/alunos/${encodeURIComponent(email)}`);
+      if (!res.ok) throw new Error('Erro ao buscar aluno.');
+      const dados = await res.json();
+      return dados.nome || '—';
+    } catch (err) {
+      console.error(err);
+      return '—';
+    }
+  }
+
   async function atualizarVisualizacaoTermo(termo) {
+    termoInfo.termoAluno.textContent = await buscarNomeAluno(termo.emailAluno);
     termoInfo.termoTitulo.textContent = termo.titulo;
     termoInfo.termoOrientador.textContent = await buscarNomeProfessor(termo.emailOrientador);
 
@@ -90,6 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
       termoInfo.termoCoorientador.textContent = await buscarNomeProfessor(termo.emailCoorientador);
     } else {
       termoInfo.termoCoorientadorContainer.style.display = 'none';
+    }
+
+    if (termo.nomeParceiro) {
+      termoInfo.termoParceiroContainer.style.display = 'block';
+      termoInfo.termoParceiro.textContent = termo.nomeParceiro;
+    } else {
+      termoInfo.termoParceiroContainer.style.display = 'none';
     }
 
     termoInfo.termoAnoSemestre.textContent = `${termo.ano}/${termo.semestre}`;
@@ -191,12 +215,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const offset = 3 * 60;
       const dataUTC3 = new Date(data.getTime() - offset * 60 * 1000).toISOString();
 
+      let parceiroData = null;
+      if (aluno.parceiro) {
+        try {
+          const resParceiro = await fetch(`/alunos/${encodeURIComponent(aluno.parceiro)}`);
+          if (resParceiro.ok) {
+            parceiroData = await resParceiro.json();
+          }
+        } catch (error) {
+          console.log('Erro ao buscar dados do parceiro:', error);
+        }
+      }
+
       const termo = {
         titulo: campos.titulo.value.trim(),
         emailAluno: aluno.email,
         nomeAluno: aluno.nome,
         telefoneAluno: aluno.telefone,
         cursoAluno: aluno.curso,
+        emailParceiro: parceiroData ? parceiroData.email : null,
+        nomeParceiro: parceiroData ? parceiroData.nome : null,
         ano: campos.ano.value,
         semestre: campos.semestre.value,
         resumo: campos.resumo.value.trim(),
@@ -235,7 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const resText = await resPost.text();
       if (resText) termoSalvo = JSON.parse(resText);
 
-      mensagem.innerHTML = `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>`;
+      mensagem.innerHTML = parceiroData ? 
+        `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>` :
+        `<div class="alert alert-success">Termo de compromisso enviado com sucesso.</div>`;
       if (termoSalvo) atualizarVisualizacaoTermo(termoSalvo);
 
     } catch (error) {

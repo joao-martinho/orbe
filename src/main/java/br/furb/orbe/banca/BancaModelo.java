@@ -26,7 +26,10 @@ public class BancaModelo {
 
     @NotBlank
     @Email
-    private String emailAluno;
+    private String emailAluno1;
+
+    @Email
+    private String emailAluno2;
 
     @NotBlank
     @Email
