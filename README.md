@@ -6,5 +6,5 @@ Este repositório contém o código do Orbe, um sistema de gerenciamento de TCCs
 
 Este projeto é propriedade de João Martinho Schneider da Silva e Souza.  
 
-- Universidade Regional de Blumenau (FURB): pode usar, modificar e distribuir sob qualquer licença.  
+- Universidade Regional de Blumenau: pode usar, modificar e distribuir sob qualquer licença.  
 - Outros usuários: requerem autorização prévia do autor para uso ou distribuição.
