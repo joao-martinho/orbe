@@ -1,5 +1,8 @@
 # Orbe: um sistema de gerenciamento da disciplina TCC I no DSC da FURB
 
+> Este repositório é um *espelho (mirror)* do código-fonte original, hospedado no [GitLab](https://gitlab.com/joao-martinho/orbe).  
+> Atualizações são sincronizadas manualmente a partir do repositório principal.
+
 Este repositório contém o código do Orbe, um sistema de gerenciamento de TCCs que eu desenvolvi durante o ano de 2025 como o meu trabalho de conclusão do curso de Ciência da Computação na FURB, sob a orientação do [@dalton-reis](https://github.com/dalton-reis). O Orbe foi projetado para ajudar os professores e alunos do departamento a lidar com a comunicação e a troca de documentos exigidas pela disciplina TCC I.
 
 ## Licença
