@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="../../_favicon.ico">
+  <title>Termo pendente - Orbe</title>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="painel.html" class="btn btn-secondary">← Voltar ao painel</a>
+    <button id="btnSair" class="btn btn-danger">Sair</button>
+  </div>
+
+  <h1 class="mb-4 text-center">Termo de compromisso</h1>
+
+  <div class="card shadow-sm p-4 mb-4">
+
+    <div class="mb-3">
+      <strong>Email do aluno 1</strong>
+      <p id="textEmailAluno1" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3" id="emailAluno2Container">
+      <strong>Email do aluno 2</strong>
+      <p id="textEmailAluno2" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Telefone do aluno 1</strong>
+      <p id="textTelefoneAluno1" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3" id="telefoneAluno2Container">
+      <strong>Telefone do aluno 2</strong>
+      <p id="textTelefoneAluno2" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Curso</strong>
+      <p id="textCurso" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Título do trabalho</strong>
+      <p id="textTitulo" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Tipo de trabalho</strong>
+      <p id="textTipo" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Resumo do problema</strong>
+      <p id="textResumo" class="border border-light rounded p-2 bg-white">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Orientador</strong>
+      <p id="textOrientador" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Coorientador</strong>
+      <p id="textCoorientador" class="border-bottom pb-2">—</p>
+    </div>
+
+    <div class="mb-3">
+      <strong>Perfil do coorientador</strong>
+      <p id="textPerfilCoorientador" class="border border-light rounded p-2 bg-white">—</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <strong>Data do envio</strong>
+        <p id="textData" class="border-bottom pb-2">—</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <strong>Situação</strong>
+        <p id="textStatus" class="border-bottom pb-2">—</p>
+      </div>
+    </div>
+
+    <div class="mb-3" id="comentarioContainer">
+      <label for="comentario" class="form-label">Comentário opcional</label>
+      <textarea class="form-control" id="comentario" rows="4" placeholder="Digite o comentário..."></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3">
+      <button type="button" class="btn btn-danger" id="btnDevolver">Devolver</button>
+      <button type="button" class="btn btn-success" id="btnAprovar">Aprovar</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/termoCompromisso.js"></script>
+</body>
+</html>

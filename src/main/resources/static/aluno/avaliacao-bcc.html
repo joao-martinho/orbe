@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    >
+    <link rel="icon" href="../_favicon.ico">
+    <title>Banca de avaliação - Orbe</title>
+  </head>
+
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="painel.html" class="btn btn-secondary">← Voltar ao painel</a>
+        <button id="btnSair" class="btn btn-danger">Sair</button>
+      </div>
+
+      <h1 class="mb-4 text-center">Banca de avaliação</h1>
+      <div id="mensagens" class="mb-3"></div>
+
+      <form id="formNotas" class="card p-4 shadow-sm mb-5">
+        <div class="mb-3">
+          <label class="form-label"><strong>Aluno</strong></label>
+          <p class="border-bottom pb-2" id="aluno">—</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><strong>Curso</strong></label>
+          <p class="border-bottom pb-2" id="curso">—</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><strong>Título</strong></label>
+          <p class="border-bottom pb-2" id="titulo">—</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><strong>Orientador</strong></label>
+          <p class="border-bottom pb-2" id="orientador">—</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><strong>Coorientador</strong></label>
+          <p class="border-bottom pb-2" id="coorientador">—</p>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label"><strong>Data e hora</strong></label>
+          <p class="border-bottom pb-2" id="dataEHora">—</p>
+        </div>
+
+        <h5 class="mb-3">Envio de documentos</h5>
+
+        <div class="mb-3">
+          <label for="preProjeto" class="form-label">Pré-projeto</label>
+          <input class="form-control" type="file" id="preProjeto" accept=".pdf,.doc,.docx">
+        </div>
+
+        <div class="mb-3">
+          <label for="projeto" class="form-label">Projeto</label>
+          <input class="form-control" type="file" id="projeto" accept=".pdf,.doc,.docx">
+        </div>
+
+        <div class="mb-3">
+          <label for="parecerAvaliador" class="form-label">Parecer do avaliador</label>
+          <input class="form-control" type="file" id="parecerAvaliador" accept=".pdf,.doc,.docx">
+        </div>
+
+        <div class="mb-3">
+          <label for="parecerProfessor" class="form-label">Parecer do professor de TCC I</label>
+          <input class="form-control" type="file" id="parecerProfessor" accept=".pdf,.doc,.docx">
+        </div>
+
+        <div class="mb-4">
+          <button type="button" id="btnUpload" class="btn btn-primary">Enviar</button>
+        </div>
+
+        <h5 class="mb-3">Arquivos disponíveis</h5>
+
+        <div class="mb-3">
+          <label class="form-label">Pré-projeto</label>
+          <div class="d-flex align-items-center justify-content-between border p-2 rounded bg-white">
+            <span id="nomeArquivoPreProjeto">—</span>
+            <a href="#" id="btnDownloadPreProjeto" class="btn btn-primary btn-sm">Baixar</a>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Projeto</label>
+          <div class="d-flex align-items-center justify-content-between border p-2 rounded bg-white">
+            <span id="nomeArquivoProjeto">—</span>
+            <a href="#" id="btnDownloadProjeto" class="btn btn-primary btn-sm">Baixar</a>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Parecer do avaliador</label>
+          <div class="d-flex align-items-center justify-content-between border p-2 rounded bg-white">
+            <span id="nomeArquivoParecerAvaliador">—</span>
+            <a href="#" id="btnDownloadParecerAvaliador" class="btn btn-primary btn-sm">Baixar</a>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Parecer do professor de TCC I</label>
+          <div class="d-flex align-items-center justify-content-between border p-2 rounded bg-white">
+            <span id="nomeArquivoParecerProfTcc1">—</span>
+            <a href="#" id="btnDownloadParecerProfTcc1" class="btn btn-primary btn-sm">Baixar</a>
+          </div>
+        </div>
+
+        <h5 class="mb-3">Notas</h5>
+
+        <div class="mb-3">
+          <label for="nota1" class="form-label">Nota do avaliador ao pré-projeto</label>
+          <input type="number" step="0.1" class="form-control" id="nota1">
+        </div>
+
+        <div class="mb-3">
+          <label for="nota2" class="form-label">Nota do professor de TCC I ao pré-projeto</label>
+          <input type="number" step="0.1" class="form-control" id="nota2">
+        </div>
+
+        <div class="mb-3">
+          <label for="nota2" class="form-label">Nota da defesa de qualificação (avalidor e orientador)</label>
+          <input type="number" step="0.1" class="form-control" id="nota3">
+        </div>
+
+        <div class="mb-3">
+          <label for="nota4" class="form-label">Nota do avaliador ao projeto</label>
+          <input type="number" step="0.1" class="form-control" id="nota4">
+        </div>
+
+        <div class="mb-3">
+          <label for="nota5" class="form-label">Nota do professor de TCC I ao projeto</label>
+          <input type="number" step="0.1" class="form-control" id="nota5">
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <strong>Média semestral</strong>
+            <p class="border-bottom pb-2" id="mediaFinal">—</p>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <strong>Situação</strong>
+            <p id="textStatus" class="border-bottom pb-2">—</p>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/avaliacaoBcc.js"></script>
+  </body>
+</html>

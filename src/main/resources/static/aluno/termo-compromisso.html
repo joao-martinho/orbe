@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="icon" href="../_favicon.ico">
+  <title>Termo de compromisso - Orbe</title>
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="painel.html" class="btn btn-secondary">← Voltar ao painel</a>
+    <button id="btnSair" class="btn btn-danger">Sair</button>
+  </div>
+  
+  <h1 class="mb-4 text-center">Termo de compromisso</h1>
+
+  <div id="mensagem" class="mb-3"></div>
+
+  <form id="formTermoCompromisso" class="card p-4 shadow-sm mb-5 needs-validation" novalidate>
+  <div class="mb-3">
+    <label for="titulo" class="form-label">Título do trabalho</label>
+    <input type="text" class="form-control" id="titulo" placeholder="Digite o título do trabalho" required>
+    <div class="invalid-feedback">Por favor, insira o título do trabalho.</div>
+  </div>
+
+  <div class="mb-3" id="tipoCheckContainer" style="display:none;">
+    <span class="form-label d-block mb-1">Tipo de trabalho</span>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="tipo" id="tipoAplicado" value="aplicado" checked>
+      <label class="form-check-label" for="tipoAluno">Aplicado</label>
+    </div>
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="tipo" id="tipoInovação" value="inovacao">
+      <label class="form-check-label" for="tipoProfessor">Inovação</label>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label for="semestre" class="form-label">Quando (ano/semestre) você pretende cursar TCC II?</label>
+    <div class="d-flex gap-2">
+      <select class="form-select" id="ano" required>
+        <option value="">Ano</option>
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+        <option value="2028">2028</option>
+        <option value="2029">2029</option>
+        <option value="2030">2030</option>
+      </select>
+      <select class="form-select" id="semestre" required>
+        <option value="">Semestre</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+    </div>
+    <div class="invalid-feedback">Por favor, selecione o ano e semestre.</div>
+  </div>
+
+  <div class="mb-3" id="perfilContainer" style="display:none;">
+    <label for="perfil" class="form-label">Perfil do coorientador (menos de 500 caracteres)</label>
+    <textarea class="form-control" id="perfil" rows="4" placeholder="Digite o perfil do coorientador" required></textarea>
+    <div class="invalid-feedback">Por favor, insira o perfil do coorientador.</div>
+  </div>
+
+  <div class="mb-3">
+    <label for="resumo" class="form-label">Resumo do problema (menos de 2000 caracteres)</label>
+    <textarea class="form-control" id="resumo" rows="4" placeholder="Digite um breve resumo do trabalho" required></textarea>
+    <div class="invalid-feedback">Por favor, insira o resumo do trabalho.</div>
+  </div>
+
+  <div class="mb-4">
+    <button type="submit" class="btn btn-primary">Finalizar</button>
+  </div>
+</form>
+
+  <div id="visualizacaoTermo" class="card p-4 shadow-sm mb-5 d-none">
+    <h5 class="mb-3">Informações do termo de compromisso</h5>
+    <p><strong>Aluno:</strong> <span id="termoAluno"></span></p>
+    <p><strong>Título:</strong> <span id="termoTitulo"></span></p>
+    <p><strong>Orientador:</strong> <span id="termoOrientador"></span></p>
+    <p id="termoCoorientadorContainer"><strong>Coorientador:</strong> <span id="termoCoorientador"></span></p>
+    <p id="termoParceiroContainer" style="display:none;"><strong>Parceiro:</strong> <span id="termoParceiro"></span></p>
+    <p><strong>Semestre em que cursará TCC II:</strong> <span id="termoAnoSemestre"></span></p>
+    <p><strong>Resumo:</strong> <span id="termoResumo"></span></p>
+
+    <div id="comentarioProfessorContainer" class="mb-3 d-none">
+      <label class="form-label"><strong>Comentário:</strong></label>
+      <div class="p-3 border rounded bg-light" id="comentarioProfessor"></div>
+    </div>
+
+    <div id="termoStatus" class="alert text-center" role="alert"></div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/termoCompromisso.js"></script>
+</body>
+</html>
