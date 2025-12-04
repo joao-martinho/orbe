@@ -81,28 +81,58 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const { notaAvaliadorPreProjeto, notaAvaliadorProjeto, notaProfTcc1PreProjeto, notaProfTcc1Projeto } = campos;
 
-    preProjeto.disabled = projeto.disabled = parecerAvaliador.disabled = parecerProf.disabled = false;
+    preProjeto.disabled = false;
+    projeto.disabled = false;
+    parecerAvaliador.disabled = false;
+    parecerProf.disabled = false;
+
+    notaAvaliadorPreProjeto.disabled = false;
+    notaAvaliadorProjeto.disabled = false;
+    notaProfTcc1PreProjeto.disabled = false;
+    notaProfTcc1Projeto.disabled = false;
 
     if (papelUsuario === 'avaliador') {
-      preProjeto.disabled = projeto.disabled = true;
-      preProjeto.title = projeto.title = "Você não pode enviar este arquivo";
-      [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
-      parecerProf.disabled = true;
+        preProjeto.disabled = true;
+        projeto.disabled = true;
+        preProjeto.title = "Você não pode enviar este arquivo";
+        projeto.title = "Você não pode enviar este arquivo";
+        [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
 
-      notaAvaliadorPreProjeto.disabled = notaAvaliadorProjeto.disabled = false;
-      notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = true;
-      [notaProfTcc1PreProjeto, notaProfTcc1Projeto].forEach(el => el.classList.add('disabled-field'));
+        parecerProf.disabled = true;
+
+        notaAvaliadorPreProjeto.disabled = false;
+        notaAvaliadorProjeto.disabled = false;
+
+        notaProfTcc1PreProjeto.disabled = true;
+        notaProfTcc1Projeto.disabled = true;
+        [notaProfTcc1PreProjeto, notaProfTcc1Projeto].forEach(el => el.classList.add('disabled-field'));
     } else if (papelUsuario === 'prof_tcc1_sis') {
-      parecerAvaliador.disabled = true;
+        parecerAvaliador.disabled = true;
 
-      notaProfTcc1PreProjeto.disabled = notaProfTcc1Projeto.disabled = false;
-      notaAvaliadorPreProjeto.disabled = notaAvaliadorProjeto.disabled = true;
-      [notaAvaliadorPreProjeto, notaAvaliadorProjeto].forEach(el => el.classList.add('disabled-field'));
+        notaProfTcc1PreProjeto.disabled = false;
+        notaProfTcc1Projeto.disabled = false;
+
+        notaAvaliadorPreProjeto.disabled = true;
+        notaAvaliadorProjeto.disabled = true;
+        [notaAvaliadorPreProjeto, notaAvaliadorProjeto].forEach(el => el.classList.add('disabled-field'));
+    } else {
+      [
+          preProjeto, projeto, parecerAvaliador, parecerProf,
+          notaAvaliadorPreProjeto, notaAvaliadorProjeto,
+          notaProfTcc1PreProjeto, notaProfTcc1Projeto
+      ].forEach(el => {
+          el.disabled = true;
+          el.classList.add('disabled-field');
+      });
+
+      preProjeto.title = "Envio desabilitado";
+      projeto.title = "Envio desabilitado";
     }
 
     preProjeto.disabled = true;
     projeto.disabled = true;
-    preProjeto.title = projeto.title = "Envio desabilitado";
+    preProjeto.title = "Envio desabilitado";
+    projeto.title = "Envio desabilitado";
     [preProjeto, projeto].forEach(el => el.classList.add('disabled-field'));
   }
 

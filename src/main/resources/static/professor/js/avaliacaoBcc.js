@@ -92,12 +92,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       notaProfTcc1PreProjeto, notaProfTcc1Projeto,
       notaDefesaQualificacao
     ];
+
     todosCampos.forEach(el => {
       el.disabled = true;
       el.classList.add('disabled-field');
     });
 
-    preProjeto.title = projeto.title = "Envio desabilitado";
+    preProjeto.title = "Envio desabilitado";
+    projeto.title = "Envio desabilitado";
 
     if (papelUsuario === 'avaliador') {
       notaAvaliadorPreProjeto.disabled = false;
@@ -118,6 +120,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (papelUsuario === 'orientador') {
       notaDefesaQualificacao.disabled = false;
       notaDefesaQualificacao.classList.remove('disabled-field');
+
+    } else {
+      todosCampos.forEach(el => {
+        el.disabled = true;
+        el.classList.add('disabled-field');
+      });
+      preProjeto.title = "Envio desabilitado";
+      projeto.title = "Envio desabilitado";
     }
   }
 
