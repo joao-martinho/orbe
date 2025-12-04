@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       viewBcc.textContent = nome(bcc);
       viewSis.textContent = nome(sis);
 
-      mensagem.innerHTML = '<div class="alert alert-success text-center">Papéis atualizados com sucesso!</div>';
+      mensagem.innerHTML = '<div class="alert alert-success text-center">Papéis atualizados com sucesso.</div>';
 
       atuais = { tcc1Bcc, tcc2Bcc, tcc1Sis, tcc2Sis, bcc, sis };
     } catch (err) {

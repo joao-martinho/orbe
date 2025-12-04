@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!termos.length) {
       const placeholder = document.createElement('tr');
       placeholder.innerHTML = `
-        <td colspan="6" style="text-align:center; color:gray;">Ainda não há nenhuma banca registrada.</td>
+        <td colspan="7" style="text-align:center; color:gray;">Ainda não há nenhuma banca registrada.</td>
       `;
       listaTermos.appendChild(placeholder);
       return;
