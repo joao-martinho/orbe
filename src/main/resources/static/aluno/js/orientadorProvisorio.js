@@ -148,16 +148,35 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error('Erro ao carregar lista de alunos.');
             return response.json();
           })
-          .then(alunos => {
+          .then(async alunos => {
             const alunosSIS = alunos.filter(a => a.curso === 'SIS' && a.email !== alunoEmail);
-            
-            alunosSIS.forEach(alunoSIS => {
+
+            const parceirosDisponiveis = [];
+            for (const alunoSIS of alunosSIS) {
+              try {
+                const resp = await fetch(`/alunos/${encodeURIComponent(alunoSIS.email)}`);
+                if (!resp.ok) {
+                  console.warn('Falha ao consultar aluno:', alunoSIS.email);
+                  continue;
+                }
+
+                const dadosAluno = await resp.json();
+
+                if (dadosAluno.orientadorProvisorio === null) {
+                  parceirosDisponiveis.push(alunoSIS);
+                }
+              } catch (e) {
+                console.warn('Erro ao buscar aluno:', alunoSIS.email, e);
+              }
+            }
+
+            parceirosDisponiveis.forEach(alunoDisponivel => {
               const option = document.createElement('option');
-              option.value = alunoSIS.email;
-              option.textContent = alunoSIS.nome;
+              option.value = alunoDisponivel.email;
+              option.textContent = alunoDisponivel.nome;
               selectParceiro.appendChild(option);
             });
-            
+
             return aluno;
           });
       }

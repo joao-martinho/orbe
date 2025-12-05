@@ -161,11 +161,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const selectAvaliador = document.getElementById('avaliador');
     selectAvaliador.innerHTML = '<option value="">Escolha</option>';
+
     professores.forEach(prof => {
+      if (
+        prof.email === termo.emailOrientador ||
+        prof.email === termo.emailCoorientador
+      ) {
+        return;
+      }
+
       const option = document.createElement('option');
       option.value = prof.email;
       option.textContent = prof.nome;
-      if (prof.email === termo.emailAvaliador) option.selected = true;
+
+      if (prof.email === termo.emailAvaliador) {
+        option.selected = true;
+      }
+
       selectAvaliador.appendChild(option);
     });
 
