@@ -6,4 +6,4 @@ Observe que este é o código original do programa, tal como foi apresentado por
 
 ## Como contribuir
 
-Se você é um aluno ou professor da FURB e quiser sugerir alguma alteração no código, seja porque essa alteração já foi implementada pela equipe de manutenção da própria FURB ou porque você tem alguma sugestão que acredita ser útil, sinta-se à vontade para abrir um ticket aqui no GitHub ou, se quiser fazê-la você mesmo, criar uma solicitação de mesclagem.
+Se você é um aluno ou professor da FURB e quiser sugerir alguma alteração no código, seja porque essa alteração já foi implementada pela equipe de manutenção da própria FURB ou porque você tem alguma sugestão que acredita ser útil, sinta-se à vontade para criar um ticket aqui no GitHub ou, se quiser fazê-la você mesmo, abrir uma solicitação de mesclagem.
