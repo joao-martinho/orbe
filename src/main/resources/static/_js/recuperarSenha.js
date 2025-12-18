@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!resPatch.ok) throw new Error('Houve um erro. Verifique suas credenciais e tente novamente.');
 
-            mostrarMensagem('Senha alterada com sucesso!', 'success');
+            mostrarMensagem('Senha alterada com sucesso.', 'success');
 
             emailInput.value = '';
             senhaInput.value = '';

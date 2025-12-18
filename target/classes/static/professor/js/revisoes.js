@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!resp.ok) throw new Error('Erro ao enviar documento.');
 
-      mensagem.textContent = 'Revisão enviada com sucesso!';
+      mensagem.textContent = 'Revisão enviada com sucesso.';
       mensagem.className = 'text-center text-success mb-3';
 
       formulario.reset();

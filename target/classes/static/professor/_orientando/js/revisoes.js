@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!resp.ok) throw new Error('Erro ao enviar revisão.');
 
-      mensagem.textContent = 'Revisão enviada com sucesso!';
+      mensagem.textContent = 'Revisão enviada com sucesso.';
       mensagem.className = 'alert alert-success';
 
       form.reset();

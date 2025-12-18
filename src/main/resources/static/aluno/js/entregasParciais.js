@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // guarda o aluno carregado pra uso posterior
     carregarEntregas(aluno);
   }
 
