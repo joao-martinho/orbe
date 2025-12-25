@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       return Promise.resolve(aluno);
     })
-    .then(aluno => {
+    .then(async aluno => {
       btnRemover.disabled = aluno.orientador !== null;
 
       if (aluno.orientadorProvisorio) {
@@ -216,20 +216,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (aluno.parceiro) {
         parceiroEmail = aluno.parceiro;
-        const parceiroOption = Array.from(selectParceiro.options).find(opt => opt.value === aluno.parceiro);
-        if (parceiroOption) {
-          viewParceiro.textContent = parceiroOption.textContent;
-          viewParceiroWrapper.style.display = 'block';
-          selectParceiro.value = aluno.parceiro;
 
-          checkParceiro.checked = true;
-          parceiroContainer.style.display = 'block';
-          parceiroContainer.style.maxHeight = parceiroContainer.scrollHeight + 'px';
-          parceiroContainer.style.opacity = '1';
-          checkParceiro.disabled = true;
-          selectParceiro.disabled = true;
+        checkParceiro.checked = true;
+        parceiroContainer.style.display = 'block';
+        parceiroContainer.style.maxHeight = parceiroContainer.scrollHeight + 'px';
+        parceiroContainer.style.opacity = '1';
+        checkParceiro.disabled = true;
+        selectParceiro.disabled = true;
+
+        try {
+          const respParceiro = await fetch(`/alunos/${encodeURIComponent(aluno.parceiro)}`);
+          if (respParceiro.ok) {
+            const dadosParceiro = await respParceiro.json();
+
+            viewParceiro.textContent = dadosParceiro.nome;
+            viewParceiroWrapper.style.display = 'block';
+
+            let option = Array.from(selectParceiro.options)
+              .find(opt => opt.value === aluno.parceiro);
+
+            if (!option) {
+              option = document.createElement('option');
+              option.value = aluno.parceiro;
+              option.textContent = dadosParceiro.nome;
+              selectParceiro.appendChild(option);
+            }
+
+            selectParceiro.value = aluno.parceiro;
+          }
+        } catch (e) {
+          console.warn('Erro ao carregar dados do parceiro:', e);
+          viewParceiro.textContent = aluno.parceiro;
+          viewParceiroWrapper.style.display = 'block';
         }
-      }
+    }
     })
     .catch(err => {
       console.log(err);
